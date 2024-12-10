@@ -1,0 +1,44 @@
+{
+    "questions": [
+        {
+            "question": "Comment puis-je m'inscrire ?",
+            "answer": "Vous pouvez vous inscrire via notre site web ou en envoyant un e-mail à contact@conference.com."
+        },
+        {
+            "question": "Quels sont les tarifs ?",
+            "answer": "Les tarifs dépendent de votre type de participation. Consultez notre page des tarifs pour plus de détails."
+        },
+        {
+            "question": "Où se déroule la conférence ?",
+            "answer": "La conférence se tiendra au Centre des Congrès de Paris, situé au 123 rue de l'Innovation."
+        },
+        {
+            "question": "Quels sont les horaires de la conférence ?",
+            "answer": "La conférence débutera à 9h00 et se terminera à 18h00 chaque jour."
+        },
+        {
+            "question": "Y aura-t-il un live streaming de l'événement ?",
+            "answer": "Oui, un live streaming sera disponible pour les participants qui ne peuvent pas se rendre sur place. Plus d'informations seront communiquées par e-mail."
+        },
+        {
+            "question": "Quels types d'ateliers sont proposés ?",
+            "answer": "Nous proposons des ateliers sur l'IA, la blockchain, le développement web, et bien d'autres sujets technologiques."
+        },
+        {
+            "question": "Comment puis-je devenir sponsor de l'événement ?",
+            "answer": "Veuillez nous contacter à sponsors@conference.com pour recevoir notre brochure de sponsoring."
+        },
+        {
+            "question": "Les repas sont-ils inclus ?",
+            "answer": "Oui, le déjeuner et les pauses café sont inclus dans le tarif d'inscription."
+        },
+        {
+            "question": "Y aura-t-il des sessions de networking ?",
+            "answer": "Oui, des sessions de networking sont prévues chaque jour entre 17h00 et 18h00."
+        },
+        {
+            "question": "Puis-je annuler mon inscription ?",
+            "answer": "Oui, vous pouvez annuler votre inscription jusqu'à 7 jours avant l'événement pour un remboursement complet."
+        }
+    ]
+}

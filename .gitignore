@@ -1,0 +1,15 @@
+# Environnements virtuels
+venv/
+__pycache__/
+
+# Fichiers de configuration
+.env
+
+# Fichiers système
+*.pyc
+*.log
+.DS_Store
+Thumbs.db
+
+# Base de données locale (si applicable)
+*.sqlite3

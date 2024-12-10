@@ -1,0 +1,77 @@
+[
+    {
+        "name": "Alice",
+        "email": "alice@example.com",
+        "feedback": "La conférence était exceptionnelle, j'ai beaucoup appris."
+    },
+    {
+        "name": "Bob",
+        "email": "bob@example.com",
+        "feedback": "Les pauses étaient trop courtes, difficile de se reposer."
+    },
+    {
+        "name": "Charlie",
+        "email": "charlie@example.com",
+        "feedback": "L'organisation était parfaite, bravo à l'équipe !"
+    },
+    {
+        "name": "Diane",
+        "email": "diane@example.com",
+        "feedback": "Certains sujets étaient trop techniques pour moi."
+    },
+    {
+        "name": "Eve",
+        "email": "eve@example.com",
+        "feedback": "J'ai adoré les interactions avec les conférenciers."
+    },
+    {
+        "name": "Frank",
+        "email": "frank@example.com",
+        "feedback": "Il faudrait améliorer l'accès aux slides des présentations."
+    },
+    {
+        "name": "Grace",
+        "email": "grace@example.com",
+        "feedback": "Le déjeuner était excellent, mais un peu tardif."
+    },
+    {
+        "name": "Hank",
+        "email": "hank@example.com",
+        "feedback": "Certains conférenciers n'étaient pas très clairs."
+    },
+    {
+        "name": "Ivy",
+        "email": "ivy@example.com",
+        "feedback": "J'ai beaucoup apprécié les ateliers pratiques !"
+    },
+    {
+        "name": "Jack",
+        "email": "jack@example.com",
+        "feedback": "Le programme était trop chargé, difficile de tout suivre."
+    },
+    {
+        "name": "Karen",
+        "email": "karen@example.com",
+        "feedback": "Les intervenants étaient très inspirants et motivants."
+    },
+    {
+        "name": "Leo",
+        "email": "leo@example.com",
+        "feedback": "Le Wi-Fi était instable, ce qui compliquait le travail en ligne."
+    },
+    {
+        "name": "Mia",
+        "email": "mia@example.com",
+        "feedback": "L'événement était bien organisé, merci !"
+    },
+    {
+        "name": "Noah",
+        "email": "noah@example.com",
+        "feedback": "J'aurais aimé plus d'interactivité avec les participants."
+    },
+    {
+        "name": "Olivia",
+        "email": "olivia@example.com",
+        "feedback": "La conférence était excellente, j'espère revenir l'an prochain !"
+    }
+]

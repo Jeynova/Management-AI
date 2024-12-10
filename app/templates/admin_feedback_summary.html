@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Résumé des Feedbacks</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="container mt-5">
+    <header class="text-center mb-5">
+        <h1>Résumé des Feedbacks</h1>
+        <p class="text-muted">Analyse des retours des participants</p>
+    </header>
+
+    <section id="summary" class="mb-5">
+        <h2 class="h4">Analyse Globale</h2>
+        <div class="alert alert-info">{{ summary }}</div>
+    </section>
+
+    <section id="feedback-list">
+        <h2 class="h4">Détails des Feedbacks</h2>
+        <ul class="list-group">
+            {% for feedback in feedbacks %}
+            <li class="list-group-item">
+                <strong>Texte :</strong> {{ feedback.feedback_text }}<br>
+                <strong>Sentiment :</strong> {{ feedback.sentiment }}
+            </li>
+            {% endfor %}
+        </ul>
+    </section>
+
+    <footer class="text-center mt-5">
+        <p class="text-muted">Conférence Tech - Page Admin</p>
+    </footer>
+</body>
+
+</html>
