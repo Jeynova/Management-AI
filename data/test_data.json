@@ -1,0 +1,88 @@
+{
+    "participants": [
+        {
+            "email": "john.doe@example.com",
+            "nom": "Doe",
+            "prenom": "John",
+            "sexe": "Homme",
+            "age": 30,
+            "profession": "Développeur"
+        },
+        {
+            "email": "jane.smith@example.com",
+            "nom": "Smith",
+            "prenom": "Jane",
+            "sexe": "Femme",
+            "age": 28,
+            "profession": "Designer"
+        },
+        {
+            "email": "alice.johnson@example.com",
+            "nom": "Johnson",
+            "prenom": "Alice",
+            "sexe": "Femme",
+            "age": 35,
+            "profession": "Ingénieure"
+        },
+        {
+            "email": "michael.brown@example.com",
+            "nom": "Brown",
+            "prenom": "Michael",
+            "sexe": "Homme",
+            "age": 45,
+            "profession": "Manager"
+        }
+    ],
+    "speakers": [
+        {
+            "nom": "Brown",
+            "prenom": "Alice",
+            "age": 40,
+            "sexe": "Femme",
+            "profession": "Professeur"
+        },
+        {
+            "nom": "Wilson",
+            "prenom": "Bob",
+            "age": 50,
+            "sexe": "Homme",
+            "profession": "Chercheur"
+        },
+        {
+            "nom": "Taylor",
+            "prenom": "Charlie",
+            "age": 38,
+            "sexe": "Homme",
+            "profession": "Consultant"
+        },
+        {
+            "nom": "Davis",
+            "prenom": "Diana",
+            "age": 42,
+            "sexe": "Femme",
+            "profession": "Entrepreneuse"
+        }
+    ],
+    "conferences": [
+        {
+            "theme": "Intelligence Artificielle",
+            "speaker_id": 1,
+            "horaire": "2023-11-01T10:00:00"
+        },
+        {
+            "theme": "Design Thinking",
+            "speaker_id": 2,
+            "horaire": "2023-11-02T14:00:00"
+        },
+        {
+            "theme": "Développement Durable",
+            "speaker_id": 3,
+            "horaire": "2023-11-03T09:00:00"
+        },
+        {
+            "theme": "Innovation Technologique",
+            "speaker_id": 4,
+            "horaire": "2023-11-04T11:00:00"
+        }
+    ]
+}
