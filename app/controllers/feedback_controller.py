@@ -1,7 +1,8 @@
 from flask import jsonify, request, render_template
 import openai
 import os
-from app.models import Feedback, db  # Import SQLAlchemy models
+from app.models import Feedback, db
+from datetime import datetime, timedelta
 
 def render_feedback_form():
     """Renders the feedback form."""
@@ -48,14 +49,38 @@ def submit_feedback():
         return jsonify({"error": str(e)}), 500
 
 
-def analyze_feedbacks():
-    """Provides a summary of all feedbacks."""
+def analyze_feedbacks(start_time=None, end_time=None):
+    """Provides a summary of feedbacks, optionally within a date range."""
     try:
-        # Récupérer tous les feedbacks
-        feedbacks = Feedback.query.order_by(Feedback.created_at.desc()).all()
+        # Déterminer la plage de dates
+        if start_time is None:
+            start_time = datetime.utcnow() - timedelta(days=1)
+        if end_time is None:
+            end_time = datetime.utcnow()
+
+        # Récupérer les feedbacks dans la plage de dates
+        feedbacks = Feedback.query.filter(
+            Feedback.created_at >= start_time,
+            Feedback.created_at <= end_time
+        ).order_by(Feedback.created_at.desc()).all()
 
         # Préparer les textes pour l'analyse
         feedback_texts = " ".join([fb.feedback_text for fb in feedbacks])
+        total_feedbacks = len(feedbacks)
+
+        if not feedback_texts:
+            return {
+                "total_feedbacks": 0,
+                "positive": 0,
+                "negative": 0,
+                "ratio": "0:0",
+                "summary": "Aucun feedback trouvé pour cette période."
+            }
+
+        # Calcul du ratio positif/négatif
+        positive = sum(1 for fb in feedbacks if "positif" in fb.sentiment.lower())
+        negative = total_feedbacks - positive
+        ratio = f"{positive}:{negative}"
 
         # Générer un résumé avec GPT
         openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -69,19 +94,12 @@ def analyze_feedbacks():
         )
         summary = response.choices[0].message.content.strip()
 
-        # Retourner le résumé et les feedbacks
-        return jsonify({
-            "feedbacks": [
-                {
-                    "id": fb.id,
-                    "name": fb.participant_name,
-                    "email": fb.participant_email,
-                    "feedback": fb.feedback_text,
-                    "sentiment": fb.sentiment,
-                    "created_at": fb.created_at.strftime("%Y-%m-%d %H:%M:%S")
-                } for fb in feedbacks
-            ],
+        return {
+            "total_feedbacks": total_feedbacks,
+            "positive": positive,
+            "negative": negative,
+            "ratio": ratio,
             "summary": summary
-        })
+        }
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return {"error": str(e)}

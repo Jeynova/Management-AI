@@ -8,11 +8,28 @@ from app.controllers.faq_controller import faq, add_faq, delete_faq
 from app.controllers.feedback_controller import render_feedback_form, submit_feedback
 from app.controllers.admin_controller import admin_feedback_summary
 from flask import jsonify, json,render_template
-from app.models import Participant, Speaker, Conference
+from app.models import Feedback, Participant, Speaker, Conference
 from app import db
 import random
 from sqlalchemy.exc import IntegrityError
 from datetime import datetime
+
+def get_feedbacks():
+    try:
+        feedbacks = Feedback.query.all()
+        feedback_list = [
+            {
+                "participant_name": f.participant_name,
+                "participant_email": f.participant_email,
+                "feedback_text": f.feedback_text,
+                "sentiment": f.sentiment,
+                "created_at": f.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+            }
+            for f in feedbacks
+        ]
+        return jsonify(feedbacks=feedback_list)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 def add_random_elements():
@@ -107,7 +124,8 @@ def initialize_routes(app):
     app.add_url_rule('/feedback/submit', 'submit_feedback', submit_feedback, methods=['POST'])
     app.add_url_rule('/admin/feedback-summary', 'admin_feedback_summary', admin_feedback_summary, methods=['GET'])
     app.add_url_rule('/add-random', 'add_random_elements', add_random_elements, methods=['GET', 'POST'])
-
+    app.add_url_rule('/api/feedbacks', 'get_feedbacks', get_feedbacks, methods=['GET'])
+    
        # Route pour afficher les données des tables
     @app.route('/tables', methods=['GET'])
     def display_tables():
