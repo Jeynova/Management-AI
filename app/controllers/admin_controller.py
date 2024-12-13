@@ -3,9 +3,47 @@ import openai
 from app.models import Feedback
 import os
 from dotenv import load_dotenv
-from flask import render_template
+from flask import render_template, request, redirect, url_for, flash
+from app.models import Participant, db
 
 load_dotenv()
+
+def admin_dashboard():
+    """Tableau de bord principal."""
+    return render_template('admin/dashboard.html')
+
+def manage_participants():
+    """Gère les participants."""
+    if request.method == 'POST':
+        # Ajouter un participant
+        nom = request.form.get('nom')
+        prenom = request.form.get('prenom')
+        email = request.form.get('email')
+        sexe = request.form.get('sexe')
+        age = request.form.get('age')
+        profession = request.form.get('profession')
+
+        try:
+            participant = Participant(
+                nom=nom,
+                prenom=prenom,
+                email=email,
+                sexe=sexe,
+                age=int(age) if age else None,
+                profession=profession
+            )
+            db.session.add(participant)
+            db.session.commit()
+            flash("Participant ajouté avec succès.", "success")
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Erreur lors de l'ajout : {str(e)}", "danger")
+
+        return redirect(url_for('manage_participants'))
+
+    # Récupérer tous les participants
+    participants = Participant.query.all()
+    return render_template('admin/participants.html', participants=participants)
 
 def check_auth(username, password):
     return username == os.getenv("ADMIN_USERNAME") and password == os.getenv("ADMIN_PASSWORD")
