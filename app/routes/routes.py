@@ -24,6 +24,7 @@ def initialize_routes(app):
     """Ajout des routes spécifiques non couvertes par Flask-Admin."""
     app.add_url_rule('/api/feedbacks', 'get_feedbacks', get_feedbacks, methods=['GET'])
     app.add_url_rule('/', 'home', home, methods=['GET'])
+    app.add_url_rule('/chat', 'chat', chat, methods=['GET'])
 
     @app.route('/tables', methods=['GET'])
     def display_tables():
@@ -51,3 +52,6 @@ def initialize_routes(app):
             speakers=speakers,
             conferences=conferences_with_participants
         )
+
+def chat():
+    return render_template('chat.html')
