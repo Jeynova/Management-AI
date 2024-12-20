@@ -1,5 +1,22 @@
-from app import db
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import UserMixin
 from datetime import datetime
+from app import db
+
+
+class User(UserMixin, db.Model):
+    __tablename__ = 'users'
+
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(255), unique=True, nullable=False)
+    password_hash = db.Column(db.String(255), nullable=False)
+    role = db.Column(db.String(50), nullable=False, default='participant')
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
 
 class Feedback(db.Model):
     __tablename__ = 'feedbacks'
@@ -11,9 +28,6 @@ class Feedback(db.Model):
     sentiment = db.Column(db.String(255), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    def __repr__(self):
-        return f"<Feedback {self.participant_name} ({self.sentiment})>"
-    
 class Participant(db.Model):
     __tablename__ = 'participants'
 
@@ -25,11 +39,9 @@ class Participant(db.Model):
     age = db.Column(db.Integer, nullable=True)
     profession = db.Column(db.String(255), nullable=False)
 
-    # Relation avec les conférences via une table d'association
     conferences = db.relationship(
         'Conference', secondary='participant_conferences', back_populates='participants'
     )
-
 
 class Speaker(db.Model):
     __tablename__ = 'speakers'
@@ -40,10 +52,9 @@ class Speaker(db.Model):
     age = db.Column(db.Integer, nullable=True)
     sexe = db.Column(db.String(50), nullable=True)
     profession = db.Column(db.String(255), nullable=False)
+    bio = db.Column(db.Text, nullable=True)
 
-    # Relation avec les conférences
     conferences = db.relationship('Conference', back_populates='speaker')
-
 
 class Conference(db.Model):
     __tablename__ = 'conferences'
@@ -52,15 +63,14 @@ class Conference(db.Model):
     theme = db.Column(db.String(255), nullable=False)
     speaker_id = db.Column(db.Integer, db.ForeignKey('speakers.id'), nullable=False)
     horaire = db.Column(db.DateTime, nullable=False)
+    description = db.Column(db.Text, nullable=True)
+    article = db.Column(db.Text, nullable=True)
 
-    # Relations
     speaker = db.relationship('Speaker', back_populates='conferences')
     participants = db.relationship(
         'Participant', secondary='participant_conferences', back_populates='conferences'
     )
 
-
-# Table d'association entre les participants et les conférences
 participant_conferences = db.Table(
     'participant_conferences',
     db.Column('participant_id', db.Integer, db.ForeignKey('participants.id'), primary_key=True),

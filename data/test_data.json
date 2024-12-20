@@ -67,22 +67,26 @@
         {
             "theme": "Intelligence Artificielle",
             "speaker_id": 1,
-            "horaire": "2023-11-01T10:00:00"
+            "horaire": "2023-11-01T10:00:00",
+            "description": "Explorez les dernières avancées en intelligence artificielle et leur impact sur divers secteurs."
         },
         {
             "theme": "Design Thinking",
             "speaker_id": 2,
-            "horaire": "2023-11-02T14:00:00"
+            "horaire": "2023-11-02T14:00:00",
+            "description": "Découvrez comment le design thinking peut transformer votre approche de la résolution de problèmes."
         },
         {
             "theme": "Développement Durable",
             "speaker_id": 3,
-            "horaire": "2023-11-03T09:00:00"
+            "horaire": "2023-11-03T09:00:00",
+            "description": "Apprenez les meilleures pratiques pour intégrer le développement durable dans vos projets."
         },
         {
             "theme": "Innovation Technologique",
             "speaker_id": 4,
-            "horaire": "2023-11-04T11:00:00"
+            "horaire": "2023-11-04T11:00:00",
+            "description": "Plongez dans les innovations technologiques qui façonnent l'avenir."
         }
     ]
 }

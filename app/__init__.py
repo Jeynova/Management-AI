@@ -2,6 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_admin import Admin
+from flask_admin.contrib.sqla import ModelView
 
 # Initialize extensions
 db = SQLAlchemy()
@@ -21,6 +22,8 @@ def create_app():
     )
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+    
+
     # Initialize extensions
     db.init_app(app)
     migrate.init_app(app, db)
@@ -32,7 +35,12 @@ def create_app():
     admin.add_view(ModelView(Feedback, db.session))
     admin.add_view(ModelView(Participant, db.session))
     admin.add_view(ModelView(Speaker, db.session))
-    admin.add_view(ModelView(Conference, db.session))
+    class ConferenceAdmin(ModelView):
+        form_columns = ['theme', 'speaker_id', 'horaire', 'description']  # Ajout du champ description
+        column_searchable_list = ['theme', 'description']
+        column_filters = ['theme', 'horaire']
+
+    admin.add_view(ConferenceAdmin(Conference, db.session))
 
     # Register routes
     from app.routes.routes import initialize_routes
