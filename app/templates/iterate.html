@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Améliorer un Visuel</title>
+</head>
+
+<body>
+    <h1>Améliorer un Visuel</h1>
+    <form method="POST">
+        <label for="visual_id">ID du visuel à améliorer :</label>
+        <input type="number" name="visual_id" id="visual_id" placeholder="ID du visuel"><br>
+
+        <label for="new_description">Description pour amélioration :</label>
+        <textarea name="new_description" id="new_description"
+            placeholder="Détails pour améliorer le visuel"></textarea><br>
+
+        <button type="submit">Améliorer</button>
+    </form>
+
+    {% if image_url %}
+    <h2>Nouveau Visuel :</h2>
+    <img src="{{ image_url }}" alt="Visuel amélioré" style="max-width: 100%; height: auto;">
+    {% endif %}
+</body>
+
+</html>

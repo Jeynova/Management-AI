@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Générer un Visuel</title>
+</head>
+
+<body>
+    <h1>Générer un Visuel</h1>
+    <form method="POST">
+        <label for="title">Titre :</label>
+        <input type="text" name="title" id="title" placeholder="Titre du visuel"><br>
+
+        <label for="prompt">Prompt :</label>
+        <textarea name="prompt" id="prompt" placeholder="Description pour le visuel"></textarea><br>
+
+        <label for="associated_type">Type associé :</label>
+        <select name="associated_type">
+            <option value="conference">Conférence</option>
+            <option value="article">Article</option>
+        </select><br>
+
+        <label for="associated_id">ID associé :</label>
+        <input type="number" name="associated_id" id="associated_id" placeholder="ID associé (facultatif)"><br>
+
+        <button type="submit">Générer</button>
+    </form>
+
+    {% if image_url %}
+    <h2>Visuel Généré :</h2>
+    <img src="{{ image_url }}" alt="Visuel généré" style="max-width: 100%; height: auto;">
+    {% endif %}
+</body>
+
+</html>

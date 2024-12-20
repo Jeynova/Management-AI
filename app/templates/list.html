@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <title>Liste des Visuels</title>
+</head>
+
+<body>
+    <h1>Liste des Visuels</h1>
+    <a href="{{ url_for('visuals_generate') }}">Générer un Nouveau Visuel</a>
+    <table>
+        <thead>
+            <tr>
+                <th>Titre</th>
+                <th>Image</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for visual in visuals %}
+            <tr>
+                <td>{{ visual.title }}</td>
+                <td><img src="{{ visual.image_url }}" alt="Visuel" style="width:150px;"></td>
+                <td>
+                    <a href="{{ url_for('visuals_iterate', visual_id=visual.id) }}">Améliorer</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+
+</html>

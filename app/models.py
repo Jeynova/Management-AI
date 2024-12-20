@@ -76,3 +76,15 @@ participant_conferences = db.Table(
     db.Column('participant_id', db.Integer, db.ForeignKey('participants.id'), primary_key=True),
     db.Column('conference_id', db.Integer, db.ForeignKey('conferences.id'), primary_key=True)
 )
+
+class Visual(db.Model):
+    __tablename__ = 'visuals'
+
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(255), nullable=False)
+    image_url = db.Column(db.String(500), nullable=False)
+    associated_type = db.Column(db.String(50), nullable=True)  # 'conference' ou 'article'
+    associated_id = db.Column(db.Integer, nullable=True)  # ID de la conférence ou de l'article associé
+
+    def __repr__(self):
+        return f"<Visual {self.title}>"

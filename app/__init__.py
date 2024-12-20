@@ -4,6 +4,8 @@ from flask_migrate import Migrate
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 
+
+
 # Initialize extensions
 db = SQLAlchemy()
 migrate = Migrate()
@@ -30,11 +32,12 @@ def create_app():
     admin.init_app(app)
 
     # Register Flask-Admin models dynamically
-    from app.models import Feedback, Participant, Speaker, Conference
+    from app.models import Feedback, Participant, Speaker, Conference, Visual
     from flask_admin.contrib.sqla import ModelView
     admin.add_view(ModelView(Feedback, db.session))
     admin.add_view(ModelView(Participant, db.session))
     admin.add_view(ModelView(Speaker, db.session))
+    admin.add_view(ModelView(Visual, db.session))
     class ConferenceAdmin(ModelView):
         form_columns = ['theme', 'speaker_id', 'horaire', 'description']  # Ajout du champ description
         column_searchable_list = ['theme', 'description']
