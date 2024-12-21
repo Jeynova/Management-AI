@@ -5,6 +5,11 @@ from app.models import Participant, Speaker, Conference, db
 from sqlalchemy.exc import IntegrityError
 from datetime import datetime, timedelta
 import random
+from dotenv import load_dotenv
+
+load_dotenv()
+
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 def generate_full_conference():
     """Génère une conférence complète avec des données existantes ou GPT."""

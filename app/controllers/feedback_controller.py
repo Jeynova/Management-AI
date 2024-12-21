@@ -3,6 +3,11 @@ import openai
 import os
 from app.models import Feedback, db
 from datetime import datetime, timedelta
+from dotenv import load_dotenv
+
+load_dotenv()
+
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 def render_feedback_form():
     """Renders the feedback form."""

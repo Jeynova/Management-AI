@@ -1,6 +1,9 @@
 from flask import jsonify, request
 import openai
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 def generate():
     try:

@@ -1,11 +1,8 @@
 from flask import flash, redirect, render_template, jsonify, request, url_for
 from app.controllers.home_controller import home
 from app.controllers.visual_controller import (
-    generate_visual_api,
-    iterate_visual_api,
-    generate_visual_web,
-    iterate_visual_web,
-    list_visuals_web
+    generate_visual,
+    iterate_visual,
 )
 from app.models import Feedback, Participant, Speaker, Conference, Visual
 from app.controllers.speaker_controller import (
@@ -68,13 +65,8 @@ def initialize_routes(app):
     app.add_url_rule('/api/generate-article', 'generate_article', generate_article, methods=['POST'])
 
     # API pour la génération de visuels
-    app.add_url_rule('/api/generate-visual', 'generate_visual_api', generate_visual_api, methods=['POST'])
-    app.add_url_rule('/api/iterate-visual', 'iterate_visual_api', iterate_visual_api, methods=['POST'])
-
-    # Web : Génération et itération de visuels
-    app.add_url_rule('/visuals/generate', 'generate_visual_web', generate_visual_web, methods=['GET', 'POST'])
-    app.add_url_rule('/visuals/iterate/<int:visual_id>', 'iterate_visual_web', iterate_visual_web, methods=['GET', 'POST'])
-    app.add_url_rule('/visuals', 'list_visuals_web', list_visuals_web, methods=['GET'])
+    app.add_url_rule('/api/generate-visual', 'generate_visual', generate_visual, methods=['POST'])
+    app.add_url_rule('/api/iterate-visual', 'iterate_visual', iterate_visual, methods=['POST'])
 
     # Affichage des données dans des tables
     @app.route('/tables', methods=['GET'])

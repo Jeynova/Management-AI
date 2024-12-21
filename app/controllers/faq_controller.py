@@ -2,8 +2,11 @@ from flask import jsonify, request
 import json
 import os
 import openai
+from dotenv import load_dotenv
 
+load_dotenv()
 
+openai.api_key = os.getenv("OPENAI_API_KEY")
 # Récupérer toutes les FAQs ou interroger GPT si nécessaire
 def faq():
     try:

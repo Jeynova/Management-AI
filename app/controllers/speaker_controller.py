@@ -2,6 +2,11 @@ from flask import jsonify, request
 from app.models import Speaker, db
 import openai
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 def regenerate_biography(speaker_id):
     """Régénère la biographie pour un orateur spécifique, même si elle existe déjà."""
@@ -20,7 +25,7 @@ def regenerate_biography(speaker_id):
         - Sexe : {speaker.sexe or 'Non spécifié'}
         """
 
-        response = openai.ChatCompletion.create(
+        response = openai.chat.completions.create(
             model="gpt-4",
             messages=[
                 {"role": "system", "content": "Tu es un rédacteur expert en biographies."},

@@ -8,6 +8,8 @@ from app.models import Participant, db
 
 load_dotenv()
 
+openai.api_key = os.getenv("OPENAI_API_KEY")
+
 def admin_dashboard():
     """Tableau de bord principal."""
     return render_template('admin/dashboard.html')

@@ -1,7 +1,12 @@
 from flask import jsonify, request
 from app.models import Conference
 import openai
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
+
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 def generate_article(conference_id=None, theme=None):
     """Génère un article ou un modèle de post pour une conférence ou un thème donné."""
