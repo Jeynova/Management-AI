@@ -16,6 +16,8 @@ from app.controllers.conference_controller import (
     generate_mockup_dataset
 )
 from app.controllers.article_controller import generate_article
+from app.controllers.data_controller import data_bp
+
 
 def get_feedbacks():
     """Récupère tous les feedbacks pour une API."""
@@ -35,7 +37,9 @@ def get_feedbacks():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
+def data():
+    return render_template('data.html')
+    
 def initialize_routes(app):
     """Ajout des routes spécifiques non couvertes par Flask-Admin."""
     # Route principale
@@ -68,7 +72,16 @@ def initialize_routes(app):
     app.add_url_rule('/api/generate-visual', 'generate_visual', generate_visual, methods=['POST'])
     app.add_url_rule('/api/iterate-visual', 'iterate_visual', iterate_visual, methods=['POST'])
 
+    # Enregistrement du blueprint pour la gestion des données
+    app.register_blueprint(data_bp, url_prefix='/data')
+
+    # Route pour le template data.html
+    app.add_url_rule('/data', 'data', data, methods=['GET'])
+
     # Affichage des données dans des tables
+
+
+
     @app.route('/tables', methods=['GET'])
     def display_tables():
         participants = Participant.query.all()
