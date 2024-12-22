@@ -2,127 +2,138 @@ import os
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
-from langchain.chat_models import ChatOpenAI
-from langchain.llms import OpenAI
+from langchain_community.chat_models import ChatOpenAI
+from langchain_community.llms import OpenAI
 from langchain_experimental.agents import create_pandas_dataframe_agent
 from langchain.schema import SystemMessage, HumanMessage
 from dotenv import load_dotenv, find_dotenv
 
-#OpenAIKey
+# Clé OpenAI
 load_dotenv(find_dotenv())
 os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
-#Title
-st.title('AI Assistant for Data Science 🤖')
+# Titre
+st.title('Assistant IA pour l\'analyse de données 🤖')
 
-#Welcoming message
-st.write("Hello, 👋 I am your AI Assistant and I am here to help you with your data science projects.")
+# Message de bienvenue
+st.write("Bonjour, 👋 Je suis votre assistant IA")
 
-#Explanation sidebar
+# Explication dans la barre latérale
 with st.sidebar:
-    st.write('*Your Data Science Adventure Begins with an CSV File.*')
-    st.caption('''**You may already know that every exciting data science journey starts with a dataset.
-    That's why I'd love for you to upload a CSV file.
-    Once we have your data in hand, we'll dive into understanding it and have some fun exploring it.
-    Then, we'll work together to shape your business challenge into a data science framework.
-    I'll introduce you to the coolest machine learning models, and we'll use them to tackle your problem. Sounds fun right?**
+    st.write('*Assistant d\'analyse de fichier.*')
+    st.caption('''**Bienvenue dans votre assistant. Il a été conçu afin de vous aider à analyser des fichiers de données et de récupérer les informations pertinentes afin de les sauvegarder pour une utilisation ultérieure.**
     ''')
 
     st.divider()
 
-    st.caption("<p style ='text-align:center'> made with ❤️ by Ana</p>",unsafe_allow_html=True )
+    st.caption("<p style ='text-align:center'>'''**Powered by GPT-4**'''</p>", unsafe_allow_html=True)
 
-#Initialise the key in session state
+# Initialiser la clé dans l'état de session
 if 'clicked' not in st.session_state:
-    st.session_state.clicked ={1:False}
+    st.session_state.clicked = {1: False}
 
-#Function to udpate the value in session state
+# Fonction pour mettre à jour la valeur dans l'état de session
 def clicked(button):
-    st.session_state.clicked[button]= True
-st.button("Let's get started", on_click = clicked, args=[1])
+    st.session_state.clicked[button] = True
+st.button("Commençons", on_click=clicked, args=[1])
 if st.session_state.clicked[1]:
-    user_csv = st.file_uploader("Upload your file here", type="csv")
+    user_csv = st.file_uploader("Téléchargez votre fichier ici", type="csv")
     if user_csv is not None:
         user_csv.seek(0)
         df = pd.read_csv(user_csv, low_memory=False)
 
-        #llm model
-        llm = OpenAI(temperature = 0)
+        # Modèle llm
+        llm = OpenAI(temperature=0, max_tokens=250)
 
-        #Function sidebar
+        # Fonction dans la barre latérale
         @st.cache_data
         def steps_eda():
-            steps_eda = llm('What are the steps of EDA')
+            steps_eda = llm.invoke('Quelles sont les étapes de l\'AED ( Analyse Exploratoire des Données )? Repondez de maniere clair et rapide')
             return steps_eda
 
-        #Pandas agent
-        pandas_agent = create_pandas_dataframe_agent(llm, df, verbose = True,allow_dangerous_code=True)
+        # Agent Pandas
+        pandas_agent = create_pandas_dataframe_agent(llm, df, verbose=True, allow_dangerous_code=True)
 
-        #Functions main
         @st.cache_data
         def function_agent():
-            st.write("**Data Overview**")
-            st.write("The first rows of your dataset look like this:")
-            st.write(df.head())
-            st.write("**Data Cleaning**")
-            columns_df = pandas_agent.run("What are the meaning of the columns?")
-            st.write(columns_df)
-            missing_values = pandas_agent.run("How many missing values does this dataframe have? Start the answer with 'There are'")
-            st.write(missing_values)
-            duplicates = pandas_agent.run("Are there any duplicate values and if so where?")
-            st.write(duplicates)
-            st.write("**Data Summarisation**")
+            st.write("**Aperçu des données**")
+            st.write("Les premières lignes de votre jeu de données ressemblent à ceci :")
+            st.write(df.head(5))  # Affichez seulement les 5 premières lignes
+
+            st.write("**Nettoyage des données**")
+            columns_df = pandas_agent.invoke("Quelle est la signification des colonnes ? Répondez en Français.")
+            st.write(columns_df['output'])
+
+            missing_values = pandas_agent.invoke("Combien de valeurs manquantes y a-t-il dans ce dataframe ? Commencez la réponse par 'Il y a'. Répondez en Français.")
+            st.write(missing_values['output'])
+
+            duplicates = pandas_agent.invoke("Y a-t-il des valeurs dupliquées et si oui, où ? Répondez en Français.")
+            st.write(duplicates['output'])
+
+            st.write("**Résumé des données**")
             st.write(df.describe())
-            correlation_analysis = pandas_agent.run("Calculate correlations between numerical variables to identify potential relationships.")
-            st.write(correlation_analysis)
-            outliers = pandas_agent.run("Identify outliers in the data that may be erroneous or that may have a significant impact on the analysis.")
+
+            # Calculer les corrélations en dehors de l'agent
+            correlation_matrix = df.corr(numeric_only=True)
+            st.write("**Analyse des corrélations**")
+            st.write(correlation_matrix)
+
+            # Identifier les valeurs aberrantes en dehors de l'agent
+            outliers = identify_outliers(df)  # Implémentez cette fonction selon vos besoins
+            st.write("**Valeurs aberrantes**")
             st.write(outliers)
-            new_features = pandas_agent.run("What new features would be interesting to create?.")
-            st.write(new_features)
+
+            new_features = pandas_agent.invoke("Quelles nouvelles fonctionnalités seraient intéressantes à créer ? Répondez en Français.")
+            st.write(new_features['output'])
+
             return
+
+        # Exemple de fonction pour identifier les valeurs aberrantes
+        def identify_outliers(dataframe):
+            # Implémentez votre logique pour identifier les valeurs aberrantes
+            return "Fonction d'identification des valeurs aberrantes à implémenter"
 
         @st.cache_data
         def function_question_variable():
-            st.line_chart(df, y =[user_question_variable])
-            summary_statistics = pandas_agent.run(f"Give me a summary of the statistics of {user_question_variable}")
-            st.write(summary_statistics)
-            normality = pandas_agent.run(f"Check for normality or specific distribution shapes of {user_question_variable}")
-            st.write(normality)
-            outliers = pandas_agent.run(f"Assess the presence of outliers of {user_question_variable}")
-            st.write(outliers)
-            trends = pandas_agent.run(f"Analyse trends, seasonality, and cyclic patterns of {user_question_variable}")
-            st.write(trends)
-            missing_values = pandas_agent.run(f"Determine the extent of missing values of {user_question_variable}")
-            st.write(missing_values)
+            st.line_chart(df, y=[user_question_variable])
+            summary_statistics = pandas_agent.invoke(f"Donnez-moi un résumé des statistiques de {user_question_variable} Repondez en Français")
+            st.write(summary_statistics['output'])
+            normality = pandas_agent.invoke(f"Vérifiez la normalité ou les formes de distribution spécifiques de {user_question_variable} Repondez en Français")
+            st.write(normality['output'])
+            outliers = pandas_agent.invoke(f"Évaluez la présence de valeurs aberrantes de {user_question_variable} Repondez en Français")
+            st.write(outliers['output'])
+            trends = pandas_agent.invoke(f"Analysez les tendances, la saisonnalité et les motifs cycliques de {user_question_variable} Repondez en Français")
+            st.write(trends['output'])
+            missing_values = pandas_agent.invoke(f"Déterminez l'étendue des valeurs manquantes de {user_question_variable} Repondez en Français")
+            st.write(missing_values['output'])
             return
         
         @st.cache_data
         def function_question_dataframe():
-            dataframe_info = pandas_agent.run(user_question_dataframe)
-            st.write(dataframe_info)
+            dataframe_info = pandas_agent.invoke(user_question_dataframe)
+            st.write(dataframe_info['output'])
             return
 
-        #Main
+        # Principal
 
-        st.header('Exploratory data analysis')
-        st.subheader('General information about the dataset')
+        st.header('Analyse exploratoire des données')
+        st.subheader('Informations générales sur le jeu de données')
 
         with st.sidebar:
-            with st.expander('What are the steps of EDA'):
+            with st.expander('Quelles sont les étapes de l\'AED ( Analyse Exploratoire des Données )'):
                 st.write(steps_eda())
 
         function_agent()
 
-        st.subheader('Variable of study')
-        user_question_variable = st.text_input('What variable are you interested in')
-        if user_question_variable is not None and user_question_variable !="":
+        st.subheader('Variable d\'étude')
+        user_question_variable = st.text_input('Quelle variable vous intéresse ?')
+        if user_question_variable is not None and user_question_variable != "":
             function_question_variable()
 
-            st.subheader('Further study')
+            st.subheader('Étude complémentaire')
 
         if user_question_variable:
-            user_question_dataframe = st.text_input( "Is there anything else you would like to know about your dataframe?")
-            if user_question_dataframe is not None and user_question_dataframe not in ("","no","No"):
+            user_question_dataframe = st.text_input("Y a-t-il autre chose que vous aimeriez savoir sur votre dataframe ? Repondez en Français, de manière claire et détaillée. En prenant le role d'un expert en analyse de données. vous donnerez des réponses professionnelles et détaillées, ainsi que des projections sur les analyses futures.")
+            if user_question_dataframe is not None and user_question_dataframe not in ("", "non", "Non"):
                 function_question_dataframe()
-            if user_question_dataframe in ("no", "No"):
+            if user_question_dataframe in ("non", "Non"):
                 st.write("")
-
