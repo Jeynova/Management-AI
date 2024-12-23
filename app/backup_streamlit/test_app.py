@@ -1,6 +1,6 @@
 #Import required libraries
 import os 
-from apikey import apikey 
+apikey = "your_actual_api_key_here"
 
 import streamlit as st
 import pandas as pd

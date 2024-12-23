@@ -3,6 +3,21 @@ from flask_login import UserMixin
 from datetime import datetime
 from app import db
 
+class Evenement(db.Model):
+    __tablename__ = 'evenements'
+
+    id = db.Column(db.Integer, primary_key=True)
+    titre = db.Column(db.String(255), nullable=False)
+    date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    description = db.Column(db.Text, nullable=True)
+
+    conferences = db.relationship('Conference', backref='evenement', lazy=True)
+    feedbacks = db.relationship('Feedback', backref='evenement', lazy=True)
+    medias = db.relationship('Media', backref='evenement', lazy=True)
+
+    def __repr__(self):
+        return f"<Evenement {self.titre}>"
+
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
@@ -27,6 +42,7 @@ class Feedback(db.Model):
     feedback_text = db.Column(db.Text, nullable=False)
     sentiment = db.Column(db.String(255), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    evenement_id = db.Column(db.Integer, db.ForeignKey('evenements.id'), nullable=True)
 
 class Participant(db.Model):
     __tablename__ = 'participants'
@@ -65,6 +81,7 @@ class Conference(db.Model):
     horaire = db.Column(db.DateTime, nullable=False)
     description = db.Column(db.Text, nullable=True)
     article = db.Column(db.Text, nullable=True)
+    evenement_id = db.Column(db.Integer, db.ForeignKey('evenements.id'), nullable=True)
 
     speaker = db.relationship('Speaker', back_populates='conferences')
     participants = db.relationship(
@@ -85,6 +102,7 @@ class Visual(db.Model):
     image_url = db.Column(db.String(500), nullable=False)
     associated_type = db.Column(db.String(50), nullable=True)  # 'conference' ou 'article'
     associated_id = db.Column(db.Integer, nullable=True)  # ID de la conférence ou de l'article associé
+    evenement_id = db.Column(db.Integer, db.ForeignKey('evenements.id'), nullable=True)
 
     def __repr__(self):
         return f"<Visual {self.title}>"

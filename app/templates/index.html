@@ -1,15 +1,80 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Accueil</title>
+    <title>Assistant de Gestion de Conférence</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
 </head>
 
 <body>
-    <h1>Bienvenue sur le site de la conférence</h1>
-    <p>Cliquez <a href="/feedback">ici</a> pour donner votre avis.</p>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <a class="navbar-brand" href="#">Gestion Conférence</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item"><a class="nav-link" href="#projets">Projets</a></li>
+                <li class="nav-item"><a class="nav-link" href="#analyses">Analyses</a></li>
+                <li class="nav-item"><a class="nav-link" href="#faq">FAQ</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Header Section -->
+    <header class="bg-primary text-white text-center py-5">
+        <div class="container">
+            <h1 class="display-4">Bienvenue dans l'Assistant de Gestion de Conférence</h1>
+            <p class="lead">Simplifiez la planification, la création et la gestion de vos événements grâce à l'IA.</p>
+            <a href="#projets" class="btn btn-light btn-lg">Commencez Maintenant</a>
+        </div>
+    </header>
+
+    <!-- Features Section -->
+    <section id="projets" class="py-5">
+        <div class="container">
+            <div class="row text-center">
+                <div class="col-md-4">
+                    <div class="feature-box">
+                        <img src="/static/images/project.png" class="img-fluid" alt="Projets">
+                        <h3 class="my-3">Projets</h3>
+                        <p>Créez et gérez des projets de conférence complets avec des données simulées ou réelles.</p>
+                        <a href="/projects" class="btn btn-primary">Voir Projets</a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-box">
+                        <img src="/static/images/analysis.png" class="img-fluid" alt="Analyses">
+                        <h3 class="my-3">Analyses</h3>
+                        <p>Explorez les insights générés à partir des données pour améliorer vos événements.</p>
+                        <a href="/analysis" class="btn btn-primary">Démarrer Analyse</a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-box">
+                        <img src="/static/images/faq.png" class="img-fluid" alt="FAQ">
+                        <h3 class="my-3">FAQ</h3>
+                        <p>Accédez à une FAQ dynamique pour répondre à toutes vos questions.</p>
+                        <a href="/faq" class="btn btn-primary">Accéder FAQ</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white text-center py-3">
+        <p>&copy; 2024 Gestion Conférence | Tous droits réservés</p>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.4.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 
 </html>
