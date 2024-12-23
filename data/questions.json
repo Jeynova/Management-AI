@@ -1,0 +1,62 @@
+{
+    "Aperçu_du_Fichier": {
+        "question": "Pouvez-vous fournir un aperçu du fichier de données, y compris le nombre de lignes, de colonnes et les types de données ?",
+        "response_format": "text"
+    },
+    "Valeurs_Manquantes": {
+        "question": "Y a-t-il des valeurs manquantes dans le fichier de données ? Si oui, pouvez-vous fournir un résumé ?",
+        "response_format": "text"
+    },
+    "Résumé_Statistique": {
+        "question": "Pouvez-vous fournir un résumé statistique des colonnes numériques dans le fichier de données, incluant la moyenne, la médiane et l'écart type ?",
+        "response_format": "text"
+    },
+    "Résumé_Catégoriel": {
+        "question": "Pouvez-vous fournir un résumé des colonnes catégorielles dans le fichier de données, incluant les valeurs uniques et leurs occurrences ?",
+        "response_format": "text"
+    },
+    "Corrélations": {
+        "question": "Pouvez-vous calculer les coefficients de corrélation entre les colonnes numériques du fichier de données ?",
+        "response_format": "table"
+    },
+    "Valeurs_Atypiques": {
+        "question": "Y a-t-il des valeurs atypiques dans les colonnes numériques du fichier de données ? Si oui, pouvez-vous fournir des détails sur leur nombre et leurs positions ?",
+        "response_format": "table"
+    },
+    "Normalisation": {
+        "question": "Certaines colonnes du fichier de données nécessitent-elles une normalisation ou une mise à l'échelle ? Si oui, quelle méthode recommanderiez-vous et pourquoi ?",
+        "response_format": "text"
+    },
+    "Sélection_de_Variables": {
+        "question": "Quelles caractéristiques du fichier de données semblent être les plus importantes ou pertinentes pour l'analyse ? Pouvez-vous fournir un classement ou une explication ?",
+        "response_format": "text"
+    },
+    "Visualisations_de_Données": {
+        "question": "Quels types de visualisations de données seraient les plus utiles pour comprendre les tendances et les schémas dans le fichier de données ?",
+        "response_format": "text"
+    },
+    "Analyse_de_Séries_Temporelles": {
+        "question": "Y a-t-il une composante temporelle dans le fichier de données ? Si oui, pouvez-vous fournir des informations sur les tendances, la saisonnalité ou les cycles ?",
+        "response_format": "text"
+    },
+    "Regroupement": {
+        "question": "Pouvez-vous suggérer des techniques de regroupement qui pourraient être utiles pour rassembler des enregistrements similaires dans le fichier de données ?",
+        "response_format": "text"
+    },
+    "Modèles_Prédictifs": {
+        "question": "Quelles techniques de modélisation prédictive seraient appropriées pour le fichier de données, en fonction de ses caractéristiques et du problème que vous souhaitez résoudre ?",
+        "response_format": "text"
+    },
+    "Évaluation_du_Modèle": {
+        "question": "Comment évalueriez-vous la performance des modèles prédictifs entraînés sur le fichier de données ?",
+        "response_format": "text"
+    },
+    "Nettoyage_des_Données": {
+        "question": "Y a-t-il des problèmes de qualité ou des incohérences dans le fichier de données qui doivent être corrigés avant l'analyse ?",
+        "response_format": "text"
+    },
+    "Transformation_des_Données": {
+        "question": "Certaines colonnes du fichier de données nécessitent-elles une transformation, comme l'encodage de variables catégorielles ou l'application de transformations mathématiques ?",
+        "response_format": "text"
+    }
+}
