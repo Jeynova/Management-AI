@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Gestion des Visuels{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Gestion des Visuels</h1>
+
+    <!-- Tableau des visuels -->
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Titre</th>
+                <th>Image</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for visual in visuals %}
+            <tr>
+                <td>{{ visual.id }}</td>
+                <td>{{ visual.title }}</td>
+                <td>
+                    <a href="{{ visual.image_url }}" target="_blank">
+                        <img src="{{ visual.image_url }}" alt="{{ visual.title }}" style="width: 100px;">
+                    </a>
+                </td>
+                <td>
+                    <form method="POST" action="{{ url_for('iterate_visual') }}">
+                        <input type="hidden" name="visual_id" value="{{ visual.id }}">
+                        <input type="text" name="new_description" placeholder="Nouvelle description" required>
+                        <button type="submit" class="btn btn-secondary btn-sm">Améliorer</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Formulaire de création -->
+    <h2>Créer un nouveau Visuel</h2>
+    <form method="POST" action="{{ url_for('generate_visual') }}">
+        <div class="mb-3">
+            <label for="title" class="form-label">Titre</label>
+            <input type="text" id="title" name="title" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label for="prompt" class="form-label">Prompt</label>
+            <textarea id="prompt" name="prompt" class="form-control" required></textarea>
+        </div>
+        <div class="mb-3">
+            <label for="associated_type" class="form-label">Type associé</label>
+            <select id="associated_type" name="associated_type" class="form-select">
+                <option value="conference">Conférence</option>
+                <option value="article">Article</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="associated_id" class="form-label">ID associé (optionnel)</label>
+            <input type="text" id="associated_id" name="associated_id" class="form-control">
+        </div>
+        <button type="submit" class="btn btn-primary">Créer Visuel</button>
+    </form>
+</div>
+{% endblock %}

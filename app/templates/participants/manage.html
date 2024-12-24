@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Gérer les participants</h2>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Nom</th>
+            <th>Prénom</th>
+            <th>Email</th>
+            <th>Sexe</th>
+            <th>Âge</th>
+            <th>Profession</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for participant in participants %}
+        <tr>
+            <td>{{ participant.nom }}</td>
+            <td>{{ participant.prenom }}</td>
+            <td>{{ participant.email }}</td>
+            <td>{{ participant.sexe }}</td>
+            <td>{{ participant.age }}</td>
+            <td>{{ participant.profession }}</td>
+            <td>
+                <a href="#" class="btn btn-sm btn-primary">Modifier</a>
+                <a href="#" class="btn btn-sm btn-danger">Supprimer</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h3>Ajouter un participant</h3>
+<button id="fill-with-ai" class="btn btn-outline-info mb-3">
+    <i class="fas fa-magic"></i> Remplir avec GPT
+</button>
+<form method="POST" class="form">
+    <div class="mb-3">
+        <label for="nom" class="form-label">Nom</label>
+        <input type="text" name="nom" id="nom" class="form-control" required>
+    </div>
+    <div class="mb-3">
+        <label for="prenom" class="form-label">Prénom</label>
+        <input type="text" name="prenom" id="prenom" class="form-control" required>
+    </div>
+    <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input type="email" name="email" id="email" class="form-control" required>
+    </div>
+    <div class="mb-3">
+        <label for="sexe" class="form-label">Sexe</label>
+        <select name="sexe" id="sexe" class="form-select">
+            <option value="Homme">Homme</option>
+            <option value="Femme">Femme</option>
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="age" class="form-label">Âge</label>
+        <input type="number" name="age" id="age" class="form-control">
+    </div>
+    <div class="mb-3">
+        <label for="profession" class="form-label">Profession</label>
+        <input type="text" name="profession" id="profession" class="form-control" required>
+    </div>
+    <button type="submit" class="btn btn-success">Ajouter</button>
+</form>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/participants.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Gestion des Conférenciers{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Gestion des Conférenciers</h1>
+
+    <!-- Tableau des conférenciers -->
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Nom</th>
+                <th>Prénom</th>
+                <th>Profession</th>
+                <th>Biographie</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for speaker in speakers %}
+            <tr>
+                <td>{{ speaker.id }}</td>
+                <td>{{ speaker.nom }}</td>
+                <td>{{ speaker.prenom }}</td>
+                <td>{{ speaker.profession }}</td>
+                <td>{{ speaker.bio or "Non spécifiée" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Formulaire de création -->
+    <h2>Ajouter un nouveau conférencier</h2>
+    <form method="POST">
+        <div class="mb-3">
+            <label for="nom" class="form-label">Nom</label>
+            <input type="text" id="nom" name="nom" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label for="prenom" class="form-label">Prénom</label>
+            <input type="text" id="prenom" name="prenom" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label for="age" class="form-label">Âge</label>
+            <input type="number" id="age" name="age" class="form-control">
+        </div>
+        <div class="mb-3">
+            <label for="sexe" class="form-label">Sexe</label>
+            <select id="sexe" name="sexe" class="form-select">
+                <option value="Homme">Homme</option>
+                <option value="Femme">Femme</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="profession" class="form-label">Profession</label>
+            <input type="text" id="profession" name="profession" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label for="bio" class="form-label">Biographie</label>
+            <textarea id="bio" name="bio" class="form-control"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Ajouter Conférencier</button>
+    </form>
+</div>
+{% endblock %}

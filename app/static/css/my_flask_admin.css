@@ -1,0 +1,9 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+.navbar-brand {
+    color: #007bff !important;
+    font-weight: bold;
+}
+

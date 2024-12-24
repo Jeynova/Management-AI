@@ -3,13 +3,20 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
+from flask_talisman import Talisman
+import os
 
+app = Flask(__name__)
 
 
 # Initialize extensions
 db = SQLAlchemy()
 migrate = Migrate()
-admin = Admin(name='Admin Dashboard', template_mode='bootstrap4')
+admin = Admin(
+    app,
+    name='Admin Dashboard',
+    template_mode='bootstrap4',
+)
 
 def create_app():
     """Create and configure the Flask application."""
@@ -24,6 +31,16 @@ def create_app():
     )
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+    # Configuration sécurisée uniquement en production
+    if os.getenv('FLASK_ENV') == 'production':
+        Talisman(app, content_security_policy={
+            'default-src': "'self'",
+            'script-src': ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://*"],
+            'style-src': ["'self'", "'unsafe-inline'", "https://*"],
+        })
+    else:
+        # Désactiver la CSP en mode développement
+        Talisman(app, content_security_policy=None)
     
 
     # Initialize extensions
@@ -32,7 +49,7 @@ def create_app():
     admin.init_app(app)
 
     # Register Flask-Admin models dynamically
-    from app.models import Feedback, Participant, Speaker, Conference, Visual
+    from app.models import Feedback, Participant, Speaker, Conference, Visual, Evenement
     from flask_admin.contrib.sqla import ModelView
     admin.add_view(ModelView(Feedback, db.session))
     admin.add_view(ModelView(Participant, db.session))
@@ -44,7 +61,7 @@ def create_app():
         column_filters = ['theme', 'horaire']
 
     admin.add_view(ConferenceAdmin(Conference, db.session))
-
+    admin.add_view(ModelView(Evenement, db.session))
     # Register routes
     from app.routes.routes import initialize_routes
     initialize_routes(app)

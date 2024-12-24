@@ -1,6 +1,6 @@
 import os
 import requests
-from flask import jsonify, request
+from flask import render_template, request, redirect, url_for, flash,jsonify
 from app.models import Visual, db
 from openai import OpenAI
 from PIL import Image
@@ -24,6 +24,29 @@ def save_image_locally(image_content, filename):
     with open(filepath, "wb") as file:
         file.write(image_content)
     return filepath
+
+def manage_visuals():
+    """Affiche et gère les visuels existants."""
+    if request.method == 'POST':
+        # Création d'un nouveau visuel
+        title = request.form.get('title')
+        prompt = request.form.get('prompt')
+        associated_type = request.form.get('associated_type')
+        associated_id = request.form.get('associated_id')
+
+        # Utiliser la fonction generate_visual
+        response = generate_visual(title=title, prompt=prompt, associated_type=associated_type, associated_id=associated_id)
+
+        if response.status_code == 200:
+            flash("Visuel généré avec succès.", "success")
+        else:
+            flash("Erreur lors de la génération du visuel.", "danger")
+
+        return redirect(url_for('manage_visuals'))
+
+    # Liste des visuels existants
+    visuals = Visual.query.all()
+    return render_template('visuals/manage_visuals.html', visuals=visuals)
 
 def generate_visual():
     """Génère un visuel via DALL·E et l'enregistre dans la base de données."""

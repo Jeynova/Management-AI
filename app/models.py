@@ -13,7 +13,7 @@ class Evenement(db.Model):
 
     conferences = db.relationship('Conference', backref='evenement', lazy=True)
     feedbacks = db.relationship('Feedback', backref='evenement', lazy=True)
-    medias = db.relationship('Media', backref='evenement', lazy=True)
+    Visuals = db.relationship('Visual', backref='evenement', lazy=True)
 
     def __repr__(self):
         return f"<Evenement {self.titre}>"

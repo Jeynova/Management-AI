@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Gestion des Conférences{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Gestion des Conférences</h1>
+
+    <!-- Tableau des conférences -->
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Thème</th>
+                <th>Conférencier</th>
+                <th>Horaire</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for conference in conferences %}
+            <tr>
+                <td>{{ conference.id }}</td>
+                <td>{{ conference.theme }}</td>
+                <td>{{ conference.speaker.nom }} {{ conference.speaker.prenom }}</td>
+                <td>{{ conference.horaire.strftime('%Y-%m-%d %H:%M') }}</td>
+                <td>{{ conference.description or "Non spécifiée" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Formulaire de création -->
+    <h2>Créer une nouvelle conférence</h2>
+    <form method="POST">
+        <div class="mb-3">
+            <label for="theme" class="form-label">Thème</label>
+            <input type="text" id="theme" name="theme" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label for="speaker_id" class="form-label">Conférencier</label>
+            <select id="speaker_id" name="speaker_id" class="form-select" required>
+                {% for speaker in speakers %}
+                <option value="{{ speaker.id }}">{{ speaker.nom }} {{ speaker.prenom }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="horaire" class="form-label">Horaire</label>
+            <input type="datetime-local" id="horaire" name="horaire" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea id="description" name="description" class="form-control"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Créer Conférence</button>
+    </form>
+</div>
+{% endblock %}

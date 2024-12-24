@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Gestion du Projet : {{ event.titre }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Gestion du Projet : {{ event.titre }}</h1>
+    <p><strong>Date :</strong> {{ event.date.strftime('%Y-%m-%d') }}</p>
+    <p><strong>Description :</strong> {{ event.description or "Aucune description fournie" }}</p>
+
+    <hr>
+
+    <div class="row">
+        <!-- Conférenciers -->
+        <div class="col-md-6">
+            <h3>Conférenciers</h3>
+            <ul>
+                {% for speaker in speakers %}
+                <li>{{ speaker.nom }} {{ speaker.prenom }} - {{ speaker.profession }}</li>
+                {% endfor %}
+            </ul>
+            <a href="#" class="btn btn-primary">Ajouter un Conférencier</a>
+        </div>
+
+        <!-- Participants -->
+        <div class="col-md-6">
+            <h3>Participants</h3>
+            <ul>
+                {% for participant in participants %}
+                <li>{{ participant.nom }} {{ participant.prenom }}</li>
+                {% endfor %}
+            </ul>
+            <a href="#" class="btn btn-primary">Ajouter un Participant</a>
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="row">
+        <!-- Conférences -->
+        <div class="col-md-6">
+            <h3>Conférences</h3>
+            <ul>
+                {% for conference in conferences %}
+                <li>{{ conference.theme }} - {{ conference.horaire.strftime('%Y-%m-%d %H:%M') }}</li>
+                {% endfor %}
+            </ul>
+            <a href="#" class="btn btn-primary">Créer une Conférence</a>
+        </div>
+
+        <!-- Visuels -->
+        <div class="col-md-6">
+            <h3>Visuels</h3>
+            <ul>
+                {% for visual in visuals %}
+                <li>{{ visual.title }} - <a href="{{ visual.image_url }}" target="_blank">Voir</a></li>
+                {% endfor %}
+            </ul>
+            <a href="#" class="btn btn-primary">Créer un Visuel</a>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Feedbacks -->
+    <h3>Feedbacks</h3>
+    <ul>
+        {% for feedback in feedbacks %}
+        <li>{{ feedback.participant_name }} : {{ feedback.feedback_text }}</li>
+        {% endfor %}
+    </ul>
+
+    <hr>
+
+    <!-- Analyse et Marketing -->
+    <h3>Analyse et Marketing</h3>
+    <a href="/analysis" class="btn btn-success">Commencer une Analyse</a>
+    <a href="/marketing" class="btn btn-info">Générer du Contenu Marketing</a>
+</div>
+{% endblock %}

@@ -1,5 +1,5 @@
 import os
-from flask import jsonify, request
+from flask import jsonify, request, render_template, flash, redirect, url_for
 import openai
 from app.models import Participant, Speaker, Conference, db
 from sqlalchemy.exc import IntegrityError
@@ -10,6 +10,36 @@ from dotenv import load_dotenv
 load_dotenv()
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
+
+def manage_conferences():
+    """Affiche et gère les conférences existantes."""
+    if request.method == 'POST':
+        # Ajouter une conférence
+        theme = request.form.get('theme')
+        speaker_id = request.form.get('speaker_id')
+        horaire = request.form.get('horaire')
+        description = request.form.get('description')
+
+        try:
+            conference = Conference(
+                theme=theme,
+                speaker_id=int(speaker_id),
+                horaire=horaire,
+                description=description
+            )
+            db.session.add(conference)
+            db.session.commit()
+            flash("Conférence ajoutée avec succès.", "success")
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Erreur lors de l'ajout : {str(e)}", "danger")
+
+        return redirect(url_for('manage_conferences'))
+
+    # Liste des conférences et conférenciers existants
+    conferences = Conference.query.all()
+    speakers = Speaker.query.all()
+    return render_template('conferences/manage_conferences.html', conferences=conferences, speakers=speakers)
 
 def generate_full_conference():
     """Génère une conférence complète avec des données existantes ou GPT."""

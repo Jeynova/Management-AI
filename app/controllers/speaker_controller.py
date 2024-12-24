@@ -1,4 +1,4 @@
-from flask import jsonify, request
+from flask import jsonify, request, url_for, flash, redirect, render_template
 from app.models import Speaker, db
 import openai
 import os
@@ -7,6 +7,39 @@ from dotenv import load_dotenv
 load_dotenv()
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
+
+def manage_speakers():
+    """Affiche et gère les conférenciers existants."""
+    if request.method == 'POST':
+        # Ajouter un conférencier
+        nom = request.form.get('nom')
+        prenom = request.form.get('prenom')
+        age = request.form.get('age')
+        sexe = request.form.get('sexe')
+        profession = request.form.get('profession')
+        bio = request.form.get('bio')
+
+        try:
+            speaker = Speaker(
+                nom=nom,
+                prenom=prenom,
+                age=int(age) if age else None,
+                sexe=sexe,
+                profession=profession,
+                bio=bio
+            )
+            db.session.add(speaker)
+            db.session.commit()
+            flash("Conférencier ajouté avec succès.", "success")
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Erreur lors de l'ajout : {str(e)}", "danger")
+
+        return redirect(url_for('manage_speakers'))
+
+    # Liste des conférenciers existants
+    speakers = Speaker.query.all()
+    return render_template('speakers/manage_speakers.html', speakers=speakers)
 
 def regenerate_biography(speaker_id):
     """Régénère la biographie pour un orateur spécifique, même si elle existe déjà."""
