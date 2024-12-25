@@ -39,7 +39,7 @@ def manage_speakers():
 
     # Liste des conférenciers existants
     speakers = Speaker.query.all()
-    return render_template('speakers/manage_speakers.html', speakers=speakers)
+    return render_template('speakers/manage_speakers.html',page_name='speakers', speakers=speakers)
 
 def regenerate_biography(speaker_id):
     """Régénère la biographie pour un orateur spécifique, même si elle existe déjà."""

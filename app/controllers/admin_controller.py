@@ -45,7 +45,7 @@ def manage_participants():
 
     # Récupérer tous les participants
     participants = Participant.query.all()
-    return render_template('admin/participants.html', participants=participants)
+    return render_template('admin/participants.html',page_name='participants', participants=participants)
 
 def check_auth(username, password):
     return username == os.getenv("ADMIN_USERNAME") and password == os.getenv("ADMIN_PASSWORD")
@@ -85,7 +85,7 @@ def admin_feedback_summary():
         )
         summary = response.choices[0].message.content.strip()
 
-        return render_template("admin_feedback_summary.html", summary=summary, feedbacks=feedbacks)
+        return render_template("admin_feedback_summary.html",page_name='admin', summary=summary, feedbacks=feedbacks)
 
     except Exception as e:
         return render_template("error.html", error=str(e)), 500

@@ -2,8 +2,7 @@ from flask import flash, redirect, render_template, jsonify, request, url_for
 from app.controllers.home_controller import home
 from app.controllers.visual_controller import (
     generate_visual,
-    iterate_visual,
-    manage_visuals
+    manage_visuals,
 )
 from app.models import Feedback, Participant, Speaker, Conference, Visual
 from app.controllers.speaker_controller import (
@@ -74,7 +73,6 @@ def initialize_routes(app):
     # Visuels
     app.add_url_rule('/projets/<int:event_id>/visuels', 'manage_visuals', manage_visuals, methods=['GET', 'POST'])
     app.add_url_rule('/api/generate-visual', 'generate_visual', generate_visual, methods=['POST'])
-    app.add_url_rule('/api/iterate-visual', 'iterate_visual', iterate_visual, methods=['POST'])
 
     # Analyse et marketing
     """ app.add_url_rule('/projets/<int:event_id>/analysis', 'analysis', analysis, methods=['GET'])

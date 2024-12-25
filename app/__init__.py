@@ -6,8 +6,10 @@ from flask_admin.contrib.sqla import ModelView
 from flask_talisman import Talisman
 import os
 
+IMAGE_FOLDER = 'static/images/visuals/'
+ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 app = Flask(__name__)
-
+app.config['IMAGE_FOLDER'] = IMAGE_FOLDER
 
 # Initialize extensions
 db = SQLAlchemy()

@@ -39,7 +39,7 @@ def manage_conferences():
     # Liste des conférences et conférenciers existants
     conferences = Conference.query.all()
     speakers = Speaker.query.all()
-    return render_template('conferences/manage_conferences.html', conferences=conferences, speakers=speakers)
+    return render_template('conferences/manage_conferences.html',page_name='conferences', conferences=conferences, speakers=speakers)
 
 def generate_full_conference():
     """Génère une conférence complète avec des données existantes ou GPT."""

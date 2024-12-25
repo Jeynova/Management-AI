@@ -33,7 +33,7 @@ def manage_participants():
 
     # Récupérer tous les participants
     participants = Participant.query.all()
-    return render_template('participants/manage.html', participants=participants)
+    return render_template('participants/manage.html',page_name='participants', participants=participants)
 
 import openai
 import random

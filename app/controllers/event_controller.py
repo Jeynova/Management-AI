@@ -7,7 +7,7 @@ from app.models import Evenement, Speaker, Participant, Conference, Visual, Feed
 def list_events():
     """Affiche la liste des événements."""
     events = Evenement.query.order_by(Evenement.date.desc()).all()
-    return render_template('events/index.html', events=events)
+    return render_template('events/index.html',page_name='events', events=events)
 
 def create_event():
     """Crée un nouvel événement."""
@@ -56,5 +56,6 @@ def manage_event(event_id):
         participants=participants,
         conferences=conferences,
         visuals=visuals,
-        feedbacks=feedbacks
+        feedbacks=feedbacks,
+        page_name='events'
     )
