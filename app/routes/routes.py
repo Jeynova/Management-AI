@@ -17,7 +17,7 @@ from app.controllers.conference_controller import (
     generate_mockup_dataset,
     manage_conferences
 )
-from app.controllers.article_controller import generate_article
+from app.controllers.article_controller import manage_articles, create_article_api, create_articles_from_file
 from app.controllers.data_controller import data_bp
 from app.controllers.event_controller import (
     list_events,
@@ -90,6 +90,10 @@ def initialize_routes(app):
     # Enregistrement des autres API déjà présentes
     app.add_url_rule('/api/feedbacks', 'get_feedbacks', get_feedbacks, methods=['GET'])
     app.add_url_rule('/api/generate-random-participant', 'generate_random_participant', generate_random_participant, methods=['GET'])
+
+    app.add_url_rule('/projets/<int:event_id>/articles', 'manage_articles', manage_articles, methods=['GET', 'POST'])
+    app.add_url_rule('/api/articles', 'create_article_api', create_article_api, methods=['POST'])
+    app.add_url_rule('/api/articles/from-sponsors', 'create_articles_from_file', create_articles_from_file, methods=['POST'])
 
     @app.route('/tables', methods=['GET'])
     def display_tables():

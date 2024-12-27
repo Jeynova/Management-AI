@@ -72,6 +72,22 @@ class Speaker(db.Model):
 
     conferences = db.relationship('Conference', back_populates='speaker')
 
+class Article(db.Model):
+    __tablename__ = 'articles'
+
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(255), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    type = db.Column(db.String(50), nullable=True)  # 'marketing', 'recap', 'announcement', etc.
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relations
+    conference_id = db.Column(db.Integer, db.ForeignKey('conferences.id'), nullable=True)
+    evenement_id = db.Column(db.Integer, db.ForeignKey('evenements.id'), nullable=True)
+
+    def __repr__(self):
+        return f"<Article {self.title}>"
+
 class Conference(db.Model):
     __tablename__ = 'conferences'
 
@@ -80,13 +96,14 @@ class Conference(db.Model):
     speaker_id = db.Column(db.Integer, db.ForeignKey('speakers.id'), nullable=False)
     horaire = db.Column(db.DateTime, nullable=False)
     description = db.Column(db.Text, nullable=True)
-    article = db.Column(db.Text, nullable=True)
     evenement_id = db.Column(db.Integer, db.ForeignKey('evenements.id'), nullable=True)
 
+    # Relations
     speaker = db.relationship('Speaker', back_populates='conferences')
     participants = db.relationship(
         'Participant', secondary='participant_conferences', back_populates='conferences'
     )
+    articles = db.relationship('Article', backref='conference', lazy=True)
 
 participant_conferences = db.Table(
     'participant_conferences',

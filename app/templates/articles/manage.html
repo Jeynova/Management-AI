@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Gestion des Articles - {{ event.titre }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Gestion des Articles - {{ event.titre }}</h1>
+    <p><strong>Date :</strong> {{ event.date.strftime('%Y-%m-%d') }}</p>
+    <p><strong>Description :</strong> {{ event.description or "Aucune description fournie." }}</p>
+
+    <hr>
+    <!-- Formulaire pour importer un fichier sponsors -->
+<form id="sponsorForm" enctype="multipart/form-data">
+    <input type="hidden" name="event_id" id="event_id" value="{{ event.id }}">
+    <div class="form-group">
+        <label for="file">Importer un fichier sponsors</label>
+        <input type="file" name="file" id="file" class="form-control" accept=".csv" required>
+    </div>
+    <button type="submit" class="btn btn-primary mt-2">Générer des Articles</button>
+</form>
+    <!-- Tableau des Articles -->
+    <h3>Articles liés à l'événement</h3>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Titre</th>
+                <th>Lié à</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for article in articles %}
+            <tr>
+                <td>{{ article.title }}</td>
+                <td>
+                    {% if article.conference %}
+                    Conférence : {{ article.conference.theme }}
+                    {% else %}
+                    Événement : {{ event.titre }}
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="#" class="btn btn-primary btn-sm">Voir</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <hr>
+
+    <!-- Modal pour Ajouter un Article -->
+    <button class="btn btn-success" data-toggle="modal" data-target="#addArticleModal">Ajouter un Article</button>
+
+    <div class="modal fade" id="addArticleModal" tabindex="-1" role="dialog" aria-labelledby="addArticleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addArticleModalLabel">Article Généré</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Article Content Section -->
+                    <div id="generatedArticleContent" style="display: none;">
+                        <h4 id="generatedArticleTitle"></h4>
+                        <p id="generatedArticleText"></p>
+                    </div>
+
+                    <!-- Form Section -->
+                    <form id="addArticleForm">
+                        <div id="articleFormFields">
+                            <div class="form-group">
+                                <label for="conference_id">Lié à une Conférence</label>
+                                <select name="conference_id" id="conference_id" class="form-control">
+                                    <option value="">Aucune</option>
+                                    {% for conference in conferences %}
+                                    <option value="{{ conference.id }}">{{ conference.theme }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <input type="hidden" id="event_id" value="{{ event.id }}">
+                            <button type="submit" class="btn btn-primary mt-3">Générer</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Aperçu des Articles -->
+    <h3>Aperçu des Articles</h3>
+    {% for article in articles %}
+    <div class="card mb-3">
+        <div class="card-body">
+            <h4 class="card-title">{{ article.title }}</h4>
+            <p class="card-text">{{ article.content[:200] }}...</p>
+            <a href="#" class="btn btn-link">Lire la suite</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
