@@ -9,7 +9,7 @@ from app.controllers.speaker_controller import (
     generate_biography,
     generate_biographies_bulk,
     regenerate_biography,
-    manage_speakers
+    manage_speakers,
 )
 from app.controllers.conference_controller import (
     generate_session_description,
@@ -22,10 +22,21 @@ from app.controllers.data_controller import data_bp
 from app.controllers.event_controller import (
     list_events,
     create_event,
-    manage_event
+    manage_event,
+
+)
+from app.controllers.demo_controller import (
+    list_demo_events,
+    create_demo_event,
+    manage_demo_event,
+    submit_demo_event,
+    list_template_events,
+    manage_template_event,
+    create_template_event_form,
+    generate_full_event
 )
 
-from app.controllers.participants_controller import manage_participants, generate_random_participant
+from app.controllers.participants_controller import manage_participants, generate_random_participant, generate_random_demo_participant
 
 def get_feedbacks():
     """Récupère tous les feedbacks pour une API."""
@@ -61,6 +72,7 @@ def initialize_routes(app):
     # Participants
     app.add_url_rule('/projets/<int:event_id>/participants', 'manage_participants', manage_participants, methods=['GET', 'POST'])
     app.add_url_rule('/projets/<int:event_id>/participants/random', 'generate_random_participant', generate_random_participant, methods=['POST'])
+    app.add_url_rule('/api/generate_random_demo_participant', 'generate_random_demo_participant', generate_random_demo_participant, methods=['POST'])
 
     # Conférenciers
     app.add_url_rule('/projets/<int:event_id>/speakers', 'manage_speakers', manage_speakers, methods=['GET', 'POST'])
@@ -94,6 +106,16 @@ def initialize_routes(app):
     app.add_url_rule('/projets/<int:event_id>/articles', 'manage_articles', manage_articles, methods=['GET', 'POST'])
     app.add_url_rule('/api/articles', 'create_article_api', create_article_api, methods=['POST'])
     app.add_url_rule('/api/articles/from-sponsors', 'create_articles_from_file', create_articles_from_file, methods=['POST'])
+
+    app.add_url_rule('/demo', 'list_demo_events', list_demo_events, methods=['GET'])
+    app.add_url_rule('/api/demo/nouveau', 'create_demo_event', create_demo_event, methods=['GET', 'POST'])
+    app.add_url_rule('/api/demo/submit', 'submit_demo_event', submit_demo_event, methods=['GET', 'POST'])
+    app.add_url_rule('/demo/<int:event_id>/gestion', 'manage_demo_event', manage_demo_event, methods=['GET'])
+    app.add_url_rule('/events','list_template_events',list_template_events,methods=['GET'])
+    app.add_url_rule('/events/<int:event_id>','manage_template_event',manage_template_event,methods=['GET'])
+    app.add_url_rule('/events/create','create_template_event_form',create_template_event_form,methods=['GET'])
+    app.add_url_rule('/api/generate_full_event','generate_full_event',generate_full_event, methods=['POST'])
+
 
     @app.route('/tables', methods=['GET'])
     def display_tables():

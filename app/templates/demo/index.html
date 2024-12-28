@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Demo gestion evenement{% endblock %}
+
+{% block content %}
+<div class="sidebar">
+    <h2>Projets</h2>
+    <div class="mt-4">
+        <button id="toggleCreate" class="btn btn-primary">Créer un projet</button>
+    </div>
+</div>
+<div class="main-content">
+    <div class="container text-center my-3">
+        <div id="dynamicContent">
+            {% include "demo/lists.html" %}
+        </div>
+    </div>
+</div>
+{% endblock %}

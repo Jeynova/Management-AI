@@ -1,0 +1,128 @@
+<h1 id="eventTitle">{{ event.titre }}</h1>
+<p><strong>Date :</strong> {{ event.date.strftime('%d %B %Y') }}</p>
+<p>{{ event.description }}</p>
+
+<!-- Onglets Bootstrap -->
+<ul class="nav nav-tabs" id="eventTabs" role="tablist">
+    <li class="nav-item">
+        <a class="nav-link active" id="tab-conferences" data-toggle="tab" href="#content-conferences" role="tab"
+            aria-controls="content-conferences" aria-selected="true">Conférences</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="tab-visuals" data-toggle="tab" href="#content-visuals" role="tab"
+            aria-controls="content-visuals" aria-selected="false">Visuels</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="tab-feedbacks" data-toggle="tab" href="#content-feedbacks" role="tab"
+            aria-controls="content-feedbacks" aria-selected="false">Feedbacks</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="tab-articles" data-toggle="tab" href="#content-articles" role="tab"
+            aria-controls="content-articles" aria-selected="false">Articles</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="tab-speakers" data-toggle="tab" href="#content-speakers" role="tab"
+            aria-controls="content-speakers" aria-selected="false">Orateurs</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="tab-participants" data-toggle="tab" href="#content-participants" role="tab"
+            aria-controls="content-participants" aria-selected="false">Participants</a>
+    </li>
+</ul>
+
+<div class="tab-content" id="eventTabsContent">
+    <div class="tab-pane fade show active" id="content-conferences" role="tabpanel" aria-labelledby="tab-conferences">
+        <h3>Conférences</h3>
+        {% for conference in event.conferences %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5>{{ conference.theme }}</h5>
+                <p><strong>Horaire :</strong> {{ conference.horaire }}</p>
+                <p>{{ conference.description }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="tab-pane fade" id="content-visuals" role="tabpanel" aria-labelledby="tab-visuals">
+        <h3>Visuels</h3>
+        {% for visual in event.Visuals %}
+        <div class="card mb-3">
+            <img src="{{ visual.image_url }}" class="card-img-top" alt="{{ visual.title }}">
+            <div class="card-body">
+                <h5>{{ visual.title }}</h5>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="tab-pane fade" id="content-feedbacks" role="tabpanel" aria-labelledby="tab-feedbacks">
+        <h3>Feedbacks</h3>
+        {% for feedback in event.feedbacks %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <p><strong>{{ feedback.participant_name }}</strong> ({{ feedback.participant_email }})</p>
+                <p>{{ feedback.feedback_text }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="tab-pane fade" id="content-articles" role="tabpanel" aria-labelledby="tab-articles">
+        <h3>Articles</h3>
+        {% for article in event.articles %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5>{{ article.title }}</h5>
+                <p>{{ article.content }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="tab-pane fade" id="content-speakers" role="tabpanel" aria-labelledby="tab-speakers">
+        <h3>Orateurs</h3>
+        {% for speaker in event.conferences|map(attribute='speaker') %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5>{{ speaker.nom }} {{ speaker.prenom }}</h5>
+                <p><strong>Profession :</strong> {{ speaker.profession }}</p>
+                <p>{{ speaker.bio }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="tab-pane fade" id="content-participants" role="tabpanel" aria-labelledby="tab-participants">
+        <h3>Participants</h3>
+        {% for participant in event.conferences|map(attribute='participants')|unique %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5>{{ participant.nom }} {{ participant.prenom }}</h5>
+                <p><strong>Email :</strong> {{ participant.email }}</p>
+                <p><strong>Profession :</strong> {{ participant.profession }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<a id="backToProjects" class="btn btn-danger mt-3">Retour aux projets</a>
+
+<!-- Bouton pour lancer la génération complète -->
+<button id="generateCompleteEvent" class="btn btn-success">Générer un événement complet</button>
+
+<!-- Modal pour afficher la progression -->
+<div class="modal fade" id="generationModal" tabindex="-1" aria-labelledby="generationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="generationModalLabel">Génération complète</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <ul id="generationSteps" class="list-group">
+                    <!-- Étapes affichées ici -->
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>

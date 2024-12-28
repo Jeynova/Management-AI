@@ -1,0 +1,94 @@
+
+    body {
+        background-color: #f8f9fa; /* Fond neutre et professionnel */
+    }
+    .navbar {
+        position: sticky;
+        top: 0;
+        z-index: 1020;
+        background-color: #007bff;
+    }
+    .navbar a.navbar-brand, .navbar-nav .nav-link {
+        color: white !important;
+    }
+    .sidebar {
+        height: calc(100vh - 56px); /* Hauteur dynamique pour commencer après la nav */
+        position: fixed;
+        top: 56px;
+        left: 0;
+        width: 250px;
+        background-color: #0056b3;
+        color: white;
+        padding: 20px;
+    }
+    .sidebar a {
+        color: white;
+        display: block;
+        margin: 10px 0;
+        text-decoration: none;
+    }
+    .sidebar a:hover {
+        text-decoration: underline;
+    }
+    .main-content {
+        margin-left: 270px;
+        padding: 20px;
+    }
+    .carousel-inner .carousel-item.active,
+    .carousel-inner .carousel-item-next,
+    .carousel-inner .carousel-item-prev {
+        display: flex;
+    }
+    .carousel-inner .carousel-item {
+        display: none;
+        transition: transform 0.6s ease;
+    }
+    .carousel-inner .carousel-item > div {
+        flex: 1 0 0%;
+        margin: 5px;
+    }
+    .carousel-inner .card {
+        background: #ffffff;
+        border: none;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    .carousel-inner .card-img {
+        height: 150px;
+        overflow: hidden;
+    }
+    .carousel-inner .card-img img {
+        object-fit: cover;
+        width: 100%;
+        height: 100%;
+    }
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon {
+        filter: invert(40%);
+    }
+    .carousel-control-prev,
+    .carousel-control-next {
+        width: auto;
+        margin: 0 -20px; /* Écarter légèrement les flèches */
+    }
+
+    @media (max-width: 767px) {
+        .carousel-inner .carousel-item > div {
+            display: none;
+        }
+        .carousel-inner .carousel-item > div:first-child {
+            display: block;
+        }
+    }
+
+    @media (min-width: 768px) {
+        .carousel-inner .carousel-item-end.active,
+        .carousel-inner .carousel-item-next {
+            transform: translateX(25%);
+        }
+        .carousel-inner .carousel-item-start.active,
+        .carousel-inner .carousel-item-prev {
+            transform: translateX(-25%);
+        }
+    }
