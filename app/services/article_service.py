@@ -1,5 +1,5 @@
 import json
-from app.models import Article, Conference, Evenement
+from app.models import Article, Conference, Evenement, Participant, Speaker
 from app import db
 import openai
 from flask import flash, jsonify, redirect, render_template, request, url_for
@@ -7,104 +7,139 @@ from dotenv import load_dotenv
 import os
 import random
 from datetime import datetime, timedelta
+import re
 
 load_dotenv()
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-def generate_single_article(conference=None, event=None, article_type="blog"):
+def parse_gpt_response_to_article(raw_response):
+    """
+    Parse une réponse textuelle structurée en un dictionnaire.
+    """
+    try:
+        # Extraire les champs à partir du texte structuré
+        lines = raw_response.split("\n")
+        title = next((line.split(":")[1].strip() for line in lines if line.startswith("Titre:")), None)
+        article_type = next((line.split(":")[1].strip() for line in lines if line.startswith("Type:")), None)
+        content_index = next((i for i, line in enumerate(lines) if line.startswith("Contenu:")), None)
+        
+        if not (title and article_type and content_index is not None):
+            raise ValueError("Champs obligatoires manquants dans la réponse GPT.")
+
+        # Le contenu commence après la ligne "Contenu:"
+        content = "\n".join(lines[content_index + 1:]).strip()
+
+        return {
+            "title": title,
+            "type": article_type,
+            "content": content
+        }
+    except Exception as e:
+        raise ValueError(f"Erreur lors du parsing de la réponse GPT : {str(e)}\nRéponse brute : {raw_response}")
+    
+def generate_single_article(conference=None, event=None, article_type="blog", target_audience=None):
     """
     Génère un article unique pour une conférence ou un événement donné.
-    :param conference: Objet Conference, si l'article est pour une conférence.
-    :param event: Objet Evenement, si l'article est pour un événement.
-    :param article_type: Type d'article à générer ("blog", "scientific_review", etc.).
+    Prend en charge les communiqués de presse avec un public cible.
     """
     if not conference and not event:
         raise ValueError("Une conférence ou un événement est requis pour générer un article.")
 
-    # Définir le prompt pour GPT
+    # Construire le prompt
     if conference:
+        event= Evenement.query.get(conference.evenement_id)
         prompt = f"""
-        Rédige un article de type {article_type} pour la conférence suivante :
+        Rédige un article de type '{article_type}' pour la conférence suivante :
         - Thème : {conference.theme}
         - Conférencier : {conference.speaker.prenom} {conference.speaker.nom} ({conference.speaker.profession})
         {f"- Biographie du conférencier : {conference.speaker.bio}" if conference.speaker.bio else ""}
+        Adapte le style, la longueur de l'article et le public cible en fonction du type de conférence et du tupe d'article.
+        Retourne le contenu sous le format suivant :
+        Titre: [Titre de l'article]
+        Type: [Type de l'article]
+        Contenu:
+        [Contenu détaillé et engageant de l'article]
         """
     elif event:
         prompt = f"""
-        Rédige un article de type {article_type} pour promouvoir l'événement suivant :
+        Rédige un article de type '{article_type}' pour promouvoir l'événement suivant :
         - Titre : {event.titre}
         - Date : {event.date.strftime('%Y-%m-%d')}
         - Description : {event.description or "Pas de description fournie."}
+        {f"- Cible : {target_audience}" if target_audience else ""}
+        Adapte le style, la longueur de l'article et le public cible en fonction du type de conférence et du tupe d'article.
+        Retourne le contenu sous le format suivant :
+        Titre: [Titre de l'article]
+        Type: [Type de l'article]
+        Contenu:
+        [Contenu détaillé et engageant de l'article]
         """
 
     try:
-        response = openai.ChatCompletion.create(
+        # Appel à GPT
+        response = openai.chat.completions.create(
             model="gpt-4",
             messages=[
-                {"role": "system", "content": "Tu es un rédacteur expert en communication événementielle."},
+                {"role": "system", "content": "Tu es un expert en rédaction de contenu événementiel."},
                 {"role": "user", "content": prompt}
             ],
-            max_tokens=1000
+            max_tokens=1500
         )
         raw_response = response.choices[0].message.content.strip()
-    except Exception as e:
-        raise ValueError(f"Erreur lors de la génération de l'article : {str(e)}")
-
-    try:
-        # Parse JSON et validation
-        article_json = json.loads(raw_response)
-        title = article_json["title"]
-        content = article_json["content"]
+        # Parse la réponse textuelle
+        article_data = parse_gpt_response_to_article(raw_response)
 
         return Article(
-            title=title,
-            content=content,
-            type=article_type,
+            title=article_data["title"],
+            content=article_data["content"],
+            type=article_data["type"],
             evenement_id=event.id if event else None,
             conference_id=conference.id if conference else None
         )
-    except json.JSONDecodeError as e:
-        raise ValueError(f"JSON invalide généré par GPT : {str(e)}")
-    
-def generate_articles_for_event(event_id):
-    """Génère des articles variés pour un événement et ses conférences."""
+    except Exception as e:
+        raise ValueError(f"Erreur lors de la génération de l'article : {str(e)}")
+
+
+def generate_articles(event_id, num_articles=1):
+    """
+    Génère plusieurs articles pour un événement et ses conférences.
+    """
     try:
         # Récupérer l'événement
         event = Evenement.query.get(event_id)
         if not event:
-            return {"message": "Événement non trouvé.", "success": False}
+            raise ValueError("Événement non trouvé.")
+
+        # Récupérer les conférences associées
+        conferences = Conference.query.filter_by(evenement_id=event_id).all()
+
+        # Types d'articles disponibles
+        article_types = ["blog", "scientific_review", "announcement", "recap", "interview"]
+        target_audiences = ["presse écrite", "journaux spécialisés", "réseaux sociaux", "newsletters","Post twitter"]
 
         articles = []
 
-        # Article de blog pour l'événement
-        try:
-            event_blog_article = generate_single_article(event=event, article_type="blog")
-            db.session.add(event_blog_article)
-            articles.append(event_blog_article)
-        except Exception as e:
-            print(f"Erreur lors de la génération de l'article de blog pour l'événement : {e}")
+        for _ in range(num_articles):
+            # Randomiser la cible (événement ou conférence)
+            target = "conference" if conferences and random.choice([True, False]) else "event"
+            article_type = random.choice(article_types)
+            target_audience = random.choice(target_audiences) if article_type == "announcement" else None
 
-        # Article scientifique pour l'événement
-        try:
-            event_scientific_article = generate_single_article(event=event, article_type="scientific_review")
-            db.session.add(event_scientific_article)
-            articles.append(event_scientific_article)
-        except Exception as e:
-            print(f"Erreur lors de la génération de l'article scientifique pour l'événement : {e}")
+            # Générer l'article
+            try:
+                if target == "conference":
+                    conference = random.choice(conferences)
+                    article = generate_single_article(conference=conference, article_type=article_type)
+                else:
+                    article = generate_single_article(event=event, article_type=article_type, target_audience=target_audience)
 
-        # Articles pour les conférences
-        conferences = Conference.query.filter_by(evenement_id=event_id).all()
-        for conference in conferences:
-            for article_type in ["blog", "scientific_review", random.choice(["announcement", "recap", "interview"])]:
-                try:
-                    conference_article = generate_single_article(conference=conference, article_type=article_type)
-                    db.session.add(conference_article)
-                    articles.append(conference_article)
-                except Exception as e:
-                    print(f"Erreur lors de la génération de l'article {article_type} pour la conférence {conference.id} : {e}")
+                db.session.add(article)
+                articles.append(article)
+            except Exception as e:
+                print(f"Erreur lors de la génération de l'article {article_type} pour la cible {target} : {e}")
 
-        # Commit des articles générés
+        # Commit des articles
         db.session.commit()
 
         return {
@@ -114,7 +149,7 @@ def generate_articles_for_event(event_id):
                     "title": article.title,
                     "type": article.type,
                     "conference": article.conference.theme if article.conference else None,
-                    "event": article.evenement_id
+                    "event": event_id
                 } for article in articles
             ],
             "success": True
@@ -122,173 +157,79 @@ def generate_articles_for_event(event_id):
 
     except Exception as e:
         db.session.rollback()
-        return {"message": f"Erreur lors de la génération des articles : {e}", "success": False}
+        return jsonify({"error": f"Erreur lors de la génération des articles : {str(e)}"}), 500
     
-def generate_article_logic(event_id=None, conference_id=None):
-    """Génère un article en fonction de l'événement ou de la conférence."""
-    print(f"Début de génération d'article : event_id={event_id}, conference_id={conference_id}")
-    prompt = None  # Initialiser le prompt par défaut
-    if event_id:
-        event = Evenement.query.get(event_id)
-    
-    if conference_id:
-        conference = Conference.query.get(conference_id)
-        print(f"Conférence récupérée : {conference}")
-        if not conference:
-            raise ValueError("Conférence non trouvée.")
-
-        speaker = conference.speaker
-        if speaker and speaker.bio:
-            # Article pour une conférence avec un conférencier et une biographie
-            prompt = f"""
-            Tu es un rédacteur spécialisé en communication événementielle.
-            Je veux que tu génères un JSON structuré pour un article, sans texte additionnel en dehors du JSON. 
-            Assure-toi que les chaînes de caractères soient correctement échappées. Voici les champs que je veux:
-                - `title` : un titre captivant et court.
-                - `type` : le type d'article (par exemple, "marketing", "annonce", "recap").
-                - `content` : Rédige un article captivant pour promouvoir une conférence sur le thème suivant Structure l'article avec un titre, une introduction engageante, un développement  principal détaillant le sujet et le conférencier, et une conclusion invitant à participer :
-                                - Thème : {conference.theme}
-                                - Conférencier : {speaker.prenom} {speaker.nom} ({speaker.profession})
-                                - Biographie du conférencier : {speaker.bio}
-
-            Le JSON doit suivre ce format et ne contenir que le JSON:
-            {{
-                "title": "Titre généré",
-                "type": "Type d'article",
-                "content": "Texte complet de l'article"
-            }}
-            Tu dois retourner un JSON FORMATTE CLAIR ET UTILISABLE.
-            """
-        else:
-            # Article pour une conférence sans biographie de conférencier
-            prompt = f"""
-            Tu es un rédacteur spécialisé en communication événementielle.
-            Je veux que tu génères un JSON structuré pour un article, sans texte additionnel en dehors du JSON. 
-            Assure-toi que les chaînes de caractères soient correctement échappées. Voici les champs que je veux:
-                - `title` : un titre captivant et court.
-                - `type` : le type d'article (par exemple, "marketing", "annonce", "recap").
-                - `content` : Rédige un article captivant pour promouvoir une conférence sur le thème suivant :
-                - Thème : {conference.theme}. Structure l'article avec un titre, une introduction engageante, un développement principal détaillant le sujet et ses bénéfices, et une   conclusion invitant à participer.
-
-            Le JSON doit suivre ce format:
-            {{
-                "title": "Titre généré",
-                "type": "Type d'article",
-                "content": "Texte complet de l'article"
-            }}
-            Tu dois retourner un JSON FORMATTE CLAIR ET UTILISABLE.
-            """
-    elif event_id:
-        
-        print(f"Événement récupéré : {event}")
-        if not event:
-            raise ValueError("Événement non trouvé.")
-
-        # Article général sur l'événement
-        prompt = f"""
-        Tu es un rédacteur spécialisé en communication événementielle.
-        Je veux que tu génères un JSON structuré pour un article, sans texte additionnel en dehors du JSON. 
-        Assure-toi que les chaînes de caractères soient correctement échappées. Voici les champs que je veux:
-        - `title` : un titre captivant et court.
-        - `type` : le type d'article (par exemple, "marketing", "annonce", "recap").
-        - `content` :Rédige un article captivant pour promouvoir un événement intitulé "{event.titre}".
-        - Date : {event.date.strftime('%Y-%m-%d')}
-        - Description : {event.description or "Pas de description fournie."}
-
-        Structure l'article avec un titre, une introduction engageante, un développement principal
-        Le JSON doit suivre ce format:
-        {{
-            "title": "Titre généré",
-            "type": "Type d'article",
-            "content": "Texte complet de l'article"
-        }}
-        détaillant les points forts de l'événement, et une conclusion invitant à y participer.
-        Tu dois retourner un JSON FORMATTE CLAIR ET UTILISABLE.
-        """
-    else:
-        # Si aucun ID n'est fourni, lever une exception
-        raise ValueError("Un ID d'événement ou de conférence est requis pour générer un article.")
-
-    # Génération de l'article via GPT
+def create_mock_data():
+    """Crée un jeu de données simulé pour tester les articles et feedbacks."""
     try:
-        response = openai.chat.completions.create(
-            model="gpt-4",
-            messages=[
-                {"role": "system", "content": "Tu es un rédacteur expert en communication événementielle."},
-                {"role": "user", "content": prompt}
-            ],
-            max_tokens=1000
+        # Supprimer les données existantes
+        db.session.query(Article).delete()
+        db.session.query(Conference).delete()
+        db.session.query(Participant).delete()
+        db.session.query(Evenement).delete()
+
+        # Ajouter un événement simulé
+        event = Evenement(
+            titre="Tech Titans 2025",
+            date=datetime(2025, 2, 27),
+            description="Un événement majeur pour explorer les tendances technologiques de demain."
         )
-        raw_response = response.choices[0].message.content.strip()
-        print(f"raw_response : {raw_response}")
+        db.session.add(event)
+        db.session.flush()
 
-    except Exception as e:
-        raise ValueError(f"Erreur inattendue lors de la génération de l'article : {str(e)}")
+        # Ajouter des participants simulés
+        participants = []
+        for i in range(10):
+            participant = Participant(
+                email=f"participant{i}@example.com",
+                nom=f"Nom{i}",
+                prenom=f"Prénom{i}",
+                sexe="Homme" if i % 2 == 0 else "Femme",
+                age=random.randint(18, 60),
+                profession="Profession simulée"
+            )
+            db.session.add(participant)
+            participants.append(participant)
 
-    try:
-        # Parse the JSON directly
-        article_json = json.loads(raw_response)
+        # Ajouter des conférenciers et conférences simulés
+        speakers = []
+        conferences = []
+        for i in range(3):
+            speaker = Speaker(
+                nom=f"Conférencier{i}",
+                prenom=f"PrénomConférencier{i}",
+                age=random.randint(30, 60),
+                sexe="Homme" if i % 2 == 0 else "Femme",
+                profession="Expert en IA",
+                bio=f"Biographie de Conférencier{i}, expert en technologies et IA."
+            )
+            db.session.add(speaker)
+            speakers.append(speaker)
+            db.session.flush()
 
-        # Extract required fields
-        title = article_json["title"]
-        article_type = article_json["type"]
-        content = article_json["content"]
-    except json.JSONDecodeError as e:
-        raise ValueError(f"Erreur lors de l'analyse du JSON généré par GPT : {str(e)}")
-    except KeyError as e:
-        raise ValueError(f"Erreur : Clé manquante dans la réponse JSON : {str(e)}")
+            conference = Conference(
+                theme=f"Thème de conférence {i}",
+                speaker_id=speaker.id,
+                horaire=datetime.utcnow() + timedelta(days=random.randint(1, 30)),
+                description=f"Description de la conférence {i}.",
+                evenement_id=event.id
+            )
+            db.session.add(conference)
+            conferences.append(conference)
 
-    # Return an Article object
-    return Article(
-        title=title,
-        content=content,
-        type=article_type,
-        evenement_id=event_id if event_id else None,
-        conference_id=conference_id if conference_id else None
-    )
-
-def create_article():
-    """Crée un nouvel article."""
-    if request.method == 'POST':
-        event_id = request.form.get('event_id')
-        conference_id = request.form.get('conference_id')
-
-        try:
-            article = generate_article_logic(event_id=event_id, conference_id=conference_id)
-            db.session.add(article)
-            db.session.commit()
-            flash("Article généré avec succès.", "success")
-        except Exception as e:
-            flash(f"Erreur lors de la génération de l'article : {e}", "danger")
-
-        return redirect(url_for('list_articles'))
-
-    events = Evenement.query.all()
-    conferences = Conference.query.all()
-    return render_template('articles/create.html', events=events, conferences=conferences)
-
-
-def create_article_api():
-    """Crée un nouvel article via API."""
-    data = request.get_json()  # Récupère les données JSON
-    event_id = data.get("event_id")
-    conference_id = data.get("conference_id")
-
-    try:
-        # Générer l'article
-        article = generate_article_logic(event_id=event_id, conference_id=conference_id)
-        print(f"Article dans api : {article}")
-        db.session.add(article)
         db.session.commit()
-        conference_theme = article.conference.theme if article.conference else "Non liée à une conférence"
-
-        return jsonify({
-            "message": "Article créé avec succès.",
-            "article": {
-                "title": article.title,
-                "content": article.content,
-                "conference": conference_theme
-            }
-        }), 200
+        return {"event": event, "participants": participants, "conferences": conferences}
     except Exception as e:
-        return jsonify({"error": f"Erreur lors de la création de l'article : {str(e)}"}), 500
+        db.session.rollback()
+        raise ValueError(f"Erreur lors de la création des données simulées : {str(e)}")
+    
+def test_articles():
+    """Route pour tester la génération d'articles sur des données simulées."""
+    try:
+        mock_data = create_mock_data()
+        event = mock_data["event"]
+        response = generate_articles(event.id, num_articles=5)  # Génère 5 articles
+        return response
+    except Exception as e:
+        return jsonify({"error": f"Erreur lors du test des articles : {str(e)}"}), 500
+    

@@ -10,10 +10,10 @@ class Evenement(db.Model):
     titre = db.Column(db.String(255), nullable=False)
     date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     description = db.Column(db.Text, nullable=True)
-
-    conferences = db.relationship('Conference', backref='evenement', lazy=True)
-    feedbacks = db.relationship('Feedback', backref='evenement', lazy=True)
-    Visuals = db.relationship('Visual', backref='evenement', lazy=True)
+    theme = db.Column(db.Text, nullable=True)
+    conferences = db.relationship('Conference', backref='evenement', lazy=True, cascade="all, delete-orphan")
+    feedbacks = db.relationship('Feedback', backref='evenement', lazy=True, cascade="all, delete-orphan")
+    Visuals = db.relationship('Visual', backref='evenement', lazy=True, cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<Evenement {self.titre}>"
@@ -43,6 +43,7 @@ class Feedback(db.Model):
     sentiment = db.Column(db.String(255), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     evenement_id = db.Column(db.Integer, db.ForeignKey('evenements.id'), nullable=True)
+    conference_id = db.Column(db.Integer, db.ForeignKey('conferences.id'), nullable=True)  # Ajout ici
 
 class Participant(db.Model):
     __tablename__ = 'participants'
@@ -70,7 +71,7 @@ class Speaker(db.Model):
     profession = db.Column(db.String(255), nullable=False)
     bio = db.Column(db.Text, nullable=True)
 
-    conferences = db.relationship('Conference', back_populates='speaker')
+    conferences = db.relationship('Conference', back_populates='speaker', cascade="all, delete-orphan")
 
 class Article(db.Model):
     __tablename__ = 'articles'
@@ -79,6 +80,7 @@ class Article(db.Model):
     title = db.Column(db.String(255), nullable=False)
     content = db.Column(db.Text, nullable=False)
     type = db.Column(db.String(50), nullable=True)  # 'marketing', 'recap', 'announcement', etc.
+    target_audience = db.Column(db.String(100), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Relations
@@ -103,7 +105,7 @@ class Conference(db.Model):
     participants = db.relationship(
         'Participant', secondary='participant_conferences', back_populates='conferences'
     )
-    articles = db.relationship('Article', backref='conference', lazy=True)
+    articles = db.relationship('Article', backref='conference', lazy=True, cascade="all, delete-orphan")
 
 participant_conferences = db.Table(
     'participant_conferences',
@@ -123,3 +125,16 @@ class Visual(db.Model):
 
     def __repr__(self):
         return f"<Visual {self.title}>"
+    
+class SocialPost(db.Model):
+    __tablename__ = 'social_posts'
+
+    id = db.Column(db.Integer, primary_key=True)
+    platform = db.Column(db.String(50), nullable=False)  # 'Facebook', 'Instagram', 'X', etc.
+    content = db.Column(db.Text, nullable=False)
+    image_url = db.Column(db.String(500), nullable=True)  # URL ou chemin de l'image générée
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    evenement_id = db.Column(db.Integer, db.ForeignKey('evenements.id'), nullable=True)
+
+    def __repr__(self):
+        return f"<SocialPost {self.platform} - {self.content[:20]}...>"

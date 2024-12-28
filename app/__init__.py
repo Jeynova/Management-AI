@@ -45,15 +45,4 @@ def create_app():
     from app.routes.routes import initialize_routes
     initialize_routes(app)
 
-    @app.route('/test-db')
-    def test_db():
-        """Test database connection."""
-        from sqlalchemy import text
-        try:
-            with db.engine.connect() as connection:
-                result = connection.execute(text("SHOW TABLES;"))
-                return {"tables": [row[0] for row in result]}
-        except Exception as e:
-            return {"error": str(e)}, 500
-
     return app

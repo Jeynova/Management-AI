@@ -99,7 +99,7 @@ def generate_biography(speaker_id):
         - Sexe : {speaker.sexe or 'Non spécifié'}
         """
 
-        response = openai.ChatCompletion.create(
+        response = openai.chat.completions.create(
             model="gpt-4",
             messages=[
                 {"role": "system", "content": "Tu es un rédacteur expert en biographies."},
@@ -140,7 +140,7 @@ def generate_biographies_bulk():
             - Sexe : {speaker.sexe or 'Non spécifié'}
             """
 
-            response = openai.ChatCompletion.create(
+            response = openai.chat.completions.create(
                 model="gpt-4",
                 messages=[
                     {"role": "system", "content": "Tu es un rédacteur expert en biographies."},

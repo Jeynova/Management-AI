@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 import os
 import random
 from datetime import datetime, timedelta
+import requests
 
 def submit_feedback():
     """Handles the submission of feedback."""
@@ -25,7 +26,7 @@ def submit_feedback():
 
         # Analyse du sentiment avec GPT
         openai.api_key = os.getenv("OPENAI_API_KEY")
-        response = openai.ChatCompletion.create(
+        response = openai.chat.completions.create(
             model="gpt-4",
             messages=[
                 {"role": "system", "content": "Vous êtes un assistant expert en analyse de sentiment."},
@@ -86,7 +87,7 @@ def analyze_feedbacks(start_time=None, end_time=None):
 
         # Générer un résumé et des points à améliorer avec GPT
         openai.api_key = os.getenv("OPENAI_API_KEY")
-        response = openai.ChatCompletion.create(
+        response = openai.chat.completions.create(
             model="gpt-4",
             messages=[
                 {"role": "system", "content": "Vous êtes un assistant spécialisé en analyse de feedback."},
@@ -125,22 +126,53 @@ def analyze_feedbacks(start_time=None, end_time=None):
         return {"error": str(e)}
     
 def generate_random_feedbacks(conferences, participants, number=10):
-    """Génère des feedbacks aléatoires pour des conférences."""
+    """
+    Génère des feedbacks aléatoires pour des conférences, avec ou sans GPT.
+    """
+    feedbacks = []
     try:
-        feedbacks = []
         for _ in range(number):
-            participant = random.choice(participants)
+            # Randomiser une conférence depuis la liste de dictionnaires
             conference = random.choice(conferences)
+            participant = random.choice(participants)
 
-            feedback_text = f"C'était une super conférence sur {conference.theme} ! Merci à {conference.speaker.prenom}."
-            sentiment = "positif" if random.random() > 0.5 else "négatif"
+            # Extraire les données depuis le dictionnaire
+            conference_id = conference["id"]
+            theme = conference["theme"]
+            speaker = conference["speaker"]
 
+            # Générer un feedback via GPT
+            prompt = f"""
+            Génère un feedback de participant pour la conférence suivante :
+            - Thème : {theme}
+            - Conférencier : {speaker}
+            - Nom du participant : {participant.prenom} {participant.nom}
+            Le feedback doit être naturel et indiquer un sentiment positif ou négatif.
+            Retourne un JSON structuré comme suit :
+            {{
+                "feedback_text": "Texte du feedback",
+                "sentiment": "positif" ou "négatif"
+            }}
+            """
+            response = openai.chat.completions.create(
+                model="gpt-4",
+                messages=[
+                    {"role": "system", "content": "Tu es un générateur de feedbacks professionnels pour des conférences."},
+                    {"role": "user", "content": prompt}
+                ],
+                max_tokens=200
+            )
+
+            raw_response = response.choices[0].message.content.strip()
+            feedback_json = json.loads(raw_response)
+
+            # Créer un objet Feedback
             feedback = Feedback(
                 participant_name=f"{participant.prenom} {participant.nom}",
                 participant_email=participant.email,
-                feedback_text=feedback_text,
-                sentiment=sentiment,
-                conference_id=conference.id
+                feedback_text=feedback_json["feedback_text"],
+                sentiment=feedback_json["sentiment"],
+                conference_id=conference_id
             )
             db.session.add(feedback)
             feedbacks.append(feedback)
@@ -150,3 +182,6 @@ def generate_random_feedbacks(conferences, participants, number=10):
     except Exception as e:
         db.session.rollback()
         raise ValueError(f"Erreur lors de la génération des feedbacks : {str(e)}")
+
+    
+    

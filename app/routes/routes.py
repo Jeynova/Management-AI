@@ -37,6 +37,7 @@ from app.controllers.demo_controller import (
 )
 
 from app.controllers.participants_controller import manage_participants, generate_random_participant, generate_random_demo_participant
+from app.services.article_service import test_articles
 
 def get_feedbacks():
     """Récupère tous les feedbacks pour une API."""
@@ -115,7 +116,7 @@ def initialize_routes(app):
     app.add_url_rule('/events/<int:event_id>','manage_template_event',manage_template_event,methods=['GET'])
     app.add_url_rule('/events/create','create_template_event_form',create_template_event_form,methods=['GET'])
     app.add_url_rule('/api/generate_full_event','generate_full_event',generate_full_event, methods=['POST'])
-
+    app.add_url_rule('/api/test/articles','test_articles',test_articles, methods=['POST'])
 
     @app.route('/tables', methods=['GET'])
     def display_tables():

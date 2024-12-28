@@ -42,7 +42,7 @@ def generate_conferences_for_event(event_id, number=3):
             Propose un thème captivant pour une conférence donnée par {speaker.prenom} {speaker.nom}, 
             expert en {speaker.profession}. Le thème doit être spécifique à son domaine d'expertise.
             """
-            response = openai.ChatCompletion.create(
+            response = openai.chat.completions.create(
                 model="gpt-4",
                 messages=[
                     {"role": "system", "content": "Tu es un event planner professionnel et createur de thèmes pour des conférences professionnelles."},
@@ -58,7 +58,7 @@ def generate_conferences_for_event(event_id, number=3):
             Cette conférence sera donnée par {speaker.prenom} {speaker.nom}, un expert en {speaker.profession}.
             Décris pourquoi ce thème est important et ce que les participants apprendront.
             """
-            response = openai.ChatCompletion.create(
+            response = openai.chat.completions.create(
                 model="gpt-4",
                 messages=[
                     {"role": "system", "content": "Tu es un rédacteur expert en descriptions de conférences."},
@@ -89,7 +89,7 @@ def generate_conferences_for_event(event_id, number=3):
         # Sauvegarder toutes les conférences
         db.session.commit()
 
-        return jsonify({
+        return {
             "message": f"{len(conferences)} conférences générées avec succès.",
             "conferences": [
                 {
@@ -99,8 +99,7 @@ def generate_conferences_for_event(event_id, number=3):
                     "participants": [f"{p.prenom} {p.nom}" for p in conf.participants]
                 } for conf in conferences
             ]
-        }), 201
-
+        }
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 500

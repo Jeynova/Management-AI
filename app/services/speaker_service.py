@@ -8,69 +8,77 @@ load_dotenv()
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-def generate_random_speakers_with_biographies(number=5):
-    """Génère plusieurs orateurs avec biographies via GPT."""
+def generate_random_speakers_with_biographies(batch_size=2, total=5):
+    """Génère des orateurs avec biographies."""
+    speakers = []
     try:
-        # Prompt pour GPT
-        prompt = f"""
-        Génère {number} profils fictifs d'orateurs à une conférence. Pour chaque orateur, inclure :
-        - Nom
-        - Prénom
-        - Sexe (Homme ou Femme)
-        - Âge (entre 25 et 65 ans)
-        - Profession (spécialisée dans un domaine technique ou académique mais en rapport avec les nouvelles technologies)
-        - Une biographie captivante décrivant leurs réalisations et expertise professionnelle basé sur les informations du speaker.Cette bio servira probablement pour la creation de conference et/ou article et doit donc être complete,precise,professionnelle et captivante..
-        Retourne les informations sous forme de JSON (liste de dictionnaires).
-        Exemple :
-        [
-            {{
-                "Nom": "Dupont",
-                "Prenom": "Jean",
-                "Sexe": "Homme",
-                "Age": 45,
-                "Profession": "Expert en cybersécurité",
-                "Bio": "Jean Dupont est un expert renommé en cybersécurité avec plus de 20 ans d'expérience..."
-            }},
-            {{
-                "Nom": "Martin",
-                "Prenom": "Marie",
-                "Sexe": "Femme",
-                "Age": 38,
-                "Profession": "Chercheuse en intelligence artificielle",
-                "Bio": "Marie Martin est une chercheuse pionnière dans le domaine de l'intelligence artificielle..."
-            }}
-        ]
-        """
+        while len(speakers) < total:
+            remaining = min(batch_size, total - len(speakers))
+            prompt = f"""
+            Génère {remaining} profils fictifs d'orateurs pour une conférence avec les informations suivantes :
+            - Nom
+            - Prénom
+            - Sexe (Homme ou Femme)
+            - Âge (entre 25 et 65 ans)
+            - Profession
+            - Une biographie captivante décrivant leurs réalisations et expertise professionnelle
+            Retourne les informations sous forme de JSON (liste de dictionnaires).
+            Assure-toi que toutes les clés respectent exactement cette orthographe et ce format.
+            Exemple :
+            [
+                {{
+                    "Nom": "Dupont",
+                    "Prenom": "Jean",
+                    "Sexe": "Homme",
+                    "Age": 45,
+                    "Profession": "Expert en cybersécurité",
+                    "Bio": "Jean Dupont est un expert renommé en cybersécurité avec 20 ans d'expérience..."
+                }}
+            ]
+            """
+            response = openai.chat.completions.create(
+                model="gpt-4",
+                messages=[
+                    {"role": "system", "content": "Tu es un générateur de profils d'orateurs professionnels."},
+                    {"role": "user", "content": prompt}
+                ],
+                max_tokens=500
+            )
+            
+            raw_data = response.choices[0].message.content.strip()
+            
 
-        response = openai.ChatCompletion.create(
-            model="gpt-4",
-            messages=[
-                {"role": "system", "content": "Tu es un générateur de profils professionnels complets."},
-                {"role": "user", "content": prompt}
-            ],
-            max_tokens=1000  # Augmenté pour permettre une réponse plus grande
-        )
+            try:
+                batch_data = json.loads(raw_data)
+                if not isinstance(batch_data, list):
+                    raise ValueError(f"Le format attendu est une liste, reçu : {type(batch_data)}")
 
-        raw_data = response.choices[0].message.content.strip()
+                # Validation des clés pour chaque orateur
+                required_keys = {"Nom", "Prenom", "Sexe", "Age", "Profession", "Bio"}
+                for speaker in batch_data:
+                    missing_keys = required_keys - speaker.keys()
+                    if missing_keys:
+                        raise ValueError(f"Données manquantes : {missing_keys} dans {speaker}")
 
-        # Parse JSON et validation
-        try:
-            speakers_data = json.loads(raw_data)
-            if not isinstance(speakers_data, list):
-                raise ValueError("Le format attendu est une liste de dictionnaires.")
-        except json.JSONDecodeError as e:
-            raise ValueError(f"JSON invalide généré par GPT : {str(e)}")
+                speakers.extend(batch_data)
+            except json.JSONDecodeError:
+                raise ValueError(f"JSON invalide généré par GPT : {raw_data}")
 
-        return speakers_data
+        return speakers[:total]
 
     except Exception as e:
-        raise ValueError(f"Erreur lors de la génération des orateurs et biographies : {str(e)}")
+        raise ValueError(f"Erreur lors de la génération des orateurs : {str(e)}")
+    
 
 def save_speakers_with_biographies_to_db(speakers_data):
     """Sauvegarde les orateurs et leurs biographies dans la base de données."""
+    speakers = []
     try:
-        speakers = []
         for data in speakers_data:
+            # Vérifiez que toutes les clés sont présentes
+            if not all(key in data for key in ["Nom", "Prenom", "Sexe", "Age", "Profession", "Bio"]):
+                raise ValueError(f"Données incomplètes pour l'orateur : {data}")
+
             speaker = Speaker(
                 nom=data["Nom"],
                 prenom=data["Prenom"],

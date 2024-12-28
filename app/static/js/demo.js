@@ -95,8 +95,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function initializeCarousel() {
         let items = document.querySelectorAll('.carousel .carousel-item');
+        const totalItems = items.length;
+        const minPerSlide = 4;
+
+        // Désactiver le clonage si le nombre d'éléments est inférieur au minimum requis
+        if (totalItems <= minPerSlide) return;
+
         items.forEach((el) => {
-            const minPerSlide = 4;
             let next = el.nextElementSibling;
             for (let i = 1; i < minPerSlide; i++) {
                 if (!next) {
@@ -109,46 +114,61 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
     }
-    initializeCarousel()
+    initializeCarousel();
 
     // Écouteur pour générer l'événement complet (assurez-vous que le modal est chargé)
-    document.addEventListener("click", function (e) {
-        if (e.target && e.target.id === "generateCompleteEvent") {
-            const modalElement = document.getElementById("generationModal");
-            if (!modalElement) {
-                console.error("L'élément avec l'ID 'generationModal' est introuvable.");
-                return;
-            }
+    document.addEventListener("click", function (event) {
+        if (event.target && event.target.id === "generateCompleteEvent") {
+        // Afficher la modal
+        const modal = new bootstrap.Modal(document.getElementById("generationModal"));
+        modal.show();
 
-            const modal = new bootstrap.Modal(modalElement);
-            modal.show();
+        // Réinitialiser les états
+        const stepsList = document.getElementById("generationSteps");
+        const spinner = document.getElementById("loadingSpinner");
+        stepsList.style.display = "none";
+        spinner.style.display = "flex";
+        stepsList.innerHTML = ""; // Réinitialiser la liste des étapes
 
-            const stepsList = document.getElementById("generationSteps");
-            if (!stepsList) {
-                console.error("L'élément avec l'ID 'generationSteps' est introuvable.");
-                return;
-            }
+        // Effectuer l'appel pour générer les données
+        fetch("/api/generate_full_event", { method: "POST" })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then((data) => {
+                spinner.style.display = "none";
+                stepsList.style.display = "block";
 
-            stepsList.innerHTML = ""; // Réinitialiser la liste
+                if (!data.steps || data.steps.length === 0) {
+                    const listItem = document.createElement("li");
+                    listItem.className = "list-group-item list-group-item-warning";
+                    listItem.textContent = "Aucune étape n'a été renvoyée par le serveur.";
+                    stepsList.appendChild(listItem);
+                    return;
+                }
 
-            const addStep = (message, isSuccess = true) => {
-                const listItem = document.createElement("li");
-                listItem.className = `list-group-item ${isSuccess ? "list-group-item-success" : "list-group-item-danger"}`;
-                listItem.textContent = message;
-                stepsList.appendChild(listItem);
-            };
-
-            fetch("/api/generate_full_event", { method: "POST" })
-                .then((response) => response.json())
-                .then((data) => {
-                    data.steps.forEach((step) => addStep(step.message, step.success));
-                })
-                .catch((error) => {
-                    addStep(`Erreur lors de la génération : ${error.message}`, false);
+                // Ajouter les étapes à la liste
+                data.steps.forEach((step) => {
+                    const listItem = document.createElement("li");
+                    listItem.className = `list-group-item ${step.success ? "list-group-item-success" : "list-group-item-danger"}`;
+                    listItem.textContent = step.message;
+                    stepsList.appendChild(listItem);
                 });
+            })
+            .catch((error) => {
+                spinner.style.display = "none";
+                stepsList.style.display = "block";
+
+                const listItem = document.createElement("li");
+                listItem.className = "list-group-item list-group-item-danger";
+                listItem.textContent = `Erreur : ${error.message}`;
+                stepsList.appendChild(listItem);
+            });
         }
     });
-
     // Écouteur pour afficher un projet spécifique
     document.addEventListener("click", function (e) {
         if (e.target && e.target.classList.contains("view-project")) {

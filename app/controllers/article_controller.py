@@ -234,7 +234,7 @@ def generate_articles_from_sponsor_file(file_path):
 
         try:
             # Appel à l'API GPT pour générer l'article
-            response = openai.ChatCompletion.create(
+            response = openai.chat.completions.create(
                 model="gpt-4",
                 messages=[
                     {"role": "system", "content": "Vous êtes un rédacteur expert en communication événementielle."},
@@ -282,7 +282,7 @@ def generate_articles_from_sponsor_file(file):
 
             try:
                 # Appel à l'API GPT
-                response = openai.ChatCompletion.create(
+                response = openai.chat.completions.create(
                     model="gpt-4",
                     messages=[
                         {"role": "system", "content": "Veuillez assumer le rôle d'un expert en communication événementielle. Votre tâche est de créer des articles professionnels et complets liés à des événements ou conférences. Cette tâche spécifique implique la rédaction d'un article basé sur un fichier d'importation de sponsors d'événement."

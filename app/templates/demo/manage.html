@@ -102,22 +102,33 @@
     </div>
 </div>
 
-<a id="backToProjects" class="btn btn-danger mt-3">Retour aux projets</a>
+<div>
+    <a id="backToProjects" class="btn btn-danger">Retour aux projets</a>
+    <!-- Bouton pour lancer la génération complète -->
+    <button id="generateCompleteEvent" class="btn btn-success">Générer un événement complet</button>
 
-<!-- Bouton pour lancer la génération complète -->
-<button id="generateCompleteEvent" class="btn btn-success">Générer un événement complet</button>
+</div>
+
 
 <!-- Modal pour afficher la progression -->
 <div class="modal fade" id="generationModal" tabindex="-1" aria-labelledby="generationModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="generationModalLabel">Génération complète</h5>
+                <h5 class="modal-title" id="generationModalLabel">Génération des données</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <ul id="generationSteps" class="list-group">
-                    <!-- Étapes affichées ici -->
+                <!-- Spinner visible pendant le chargement -->
+                <div id="loadingSpinner" class="d-flex justify-content-center my-3">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Chargement...</span>
+                    </div>
+                </div>
+
+                <!-- Liste des étapes -->
+                <ul id="generationSteps" class="list-group" style="display: none;">
+                    <!-- Étapes de la génération ajoutées ici -->
                 </ul>
             </div>
             <div class="modal-footer">

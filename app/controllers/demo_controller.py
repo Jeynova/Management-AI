@@ -11,9 +11,11 @@ import re
 from datetime import datetime
 from app.services.feedback_service import generate_random_feedbacks
 from app.services.participant_service import generate_random_participants_with_gpt, save_participants_to_db
-from app.services.speaker_service import generate_speakers_with_biographies
+from app.services.speaker_service import generate_random_speakers_with_biographies, save_speakers_with_biographies_to_db
 from app.services.conference_service import generate_conferences_for_event
-from app.services.article_service import generate_articles_for_event
+from app.services.article_service import generate_articles
+from app.services.visual_service import generate_event_visuals
+from app.services.social_service import generate_social_posts
 
 
 load_dotenv()
@@ -35,11 +37,13 @@ def create_demo_event():
             - `title` : un titre d'evenement en rapport avec les nouvelles technologies simple et efficace en gardant en tête que nous somme le 27/12/2024. Exemple: The Next Web 2024, Cyber Security Global Summit,Big Data & AI Paris etc...
             - `date` : la date de preference au moins à partir d'1 mois après la date actuelle sous un format datetime compatible aux insertions sql.
             - `description` : Rédige une description captivante pour promouvoir l'evenement basé sur le titre trouvé plus haut. Ti devras adapter ton ton et le contenu en fonction du titre et du potentiel public visé ( professionnels, étudiants, grand public, etc.).
+            - `theme` : le principal theme de l'evenement basé sur la description.
         Le JSON doit suivre ce format:
         {{
             "title": "Titre généré",
             "date": "date generée",
-            "description": "description complete générée"
+            "description": "description complete générée",
+            "theme": "theme généré"
         }}
         Tu dois retourner un JSON FORMATTE CLAIR ET UTILISABLE.
         """
@@ -84,7 +88,8 @@ def create_demo_event():
     return jsonify({
                 "title": event_json["title"],
                 "description": event_json["description"],
-                "date": event_json["date"]
+                "date": event_json["date"],
+                "theme": event_json["theme"]
         }), 200
 
 def manage_demo_event(event_id):
@@ -148,44 +153,13 @@ def create_template_event_form():
 
 def generate_full_event():
     steps = []
+    current_event = Evenement.query.order_by(Evenement.id.desc()).first()
 
-    try:
-        # Étape 1 : Générer et sauvegarder les participants
-        participants_data = generate_random_participants_with_gpt(10)
-        participants = save_participants_to_db(participants_data)
-        steps.append({"message": f"{len(participants)} participants générés.", "success": True})
 
-    except Exception as e:
-        steps.append({"message": f"Erreur lors de la génération : {str(e)}", "success": False})
 
-        # Étape 2 : Générer et sauvegarder les orateurs avec biographies
-        speakers = generate_speakers_with_biographies(5)
-        steps.append({"message": f"{len(speakers)} orateurs générés avec biographies.", "success": True})
 
-        # Définir current_event avant de l'utiliser
-        current_event = Evenement.query.order_by(Evenement.id.desc()).first()
-
-        # Étape 3 : Générer des conférences
-        conferences_response = generate_conferences_for_event(event_id=current_event.id, number=3)
-        steps.append({"message": f"3 conférences générées avec succès.", "success": True})
-
-        # 4. Associer des participants et des speakers
-        """ associate_participants_and_speakers(conferences, participants)
-        steps.append({"message": "Participants et orateurs associés aux conférences.", "success": True}) """
-
-        # Étape 4 : Générer des articles pour l'événement et les conférences
-        articles_response = generate_articles_for_event(event_id=current_event.id)
-        steps.append({"message": articles_response["message"], "success": articles_response["success"]})
-
-        # 5. Générer des feedbacks aléatoires
-        feedbacks = generate_random_feedbacks(conferences_response["conferences"], participants, number=10)
-        steps.append({"message": f"{len(feedbacks)} feedbacks générés.", "success": True})
-
-        """ # 7. Générer des visuels
-        visuals = generate_visuals(conferences, articles)
-        steps.append({"message": f"{len(visuals)} visuels générés.", "success": True}) """
-
-    except Exception as e:
-        steps.append({"message": f"Erreur lors de la génération : {str(e)}", "success": False})
+    # 8. Générer des posts pour les réseaux sociaux et visuels associés
+    social = generate_social_posts(current_event.id,current_event.titre)
+    steps.append({"message": f"{len(social)} posts générés.", "success": True})
 
     return jsonify({"steps": steps})
