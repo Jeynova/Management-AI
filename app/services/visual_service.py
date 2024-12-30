@@ -25,7 +25,7 @@ def save_image_locally(image_content, filename):
     except Exception as e:
         raise ValueError(f"Erreur lors de l'enregistrement de l'image : {str(e)}")
 
-def generate_visual(title, prompt, associated_type=None, associated_id=None):
+def generate_visual(title, prompt, associated_type=None, associated_id=None,evenement_id=None):
     """
     Génère un visuel via DALL·E et l'enregistre dans la base de données.
     """
@@ -54,7 +54,8 @@ def generate_visual(title, prompt, associated_type=None, associated_id=None):
             title=title,
             image_url=image_path.split('app/', 1)[-1],
             associated_type=associated_type,
-            associated_id=associated_id
+            associated_id=associated_id,
+            evenement_id=evenement_id
         )
         db.session.add(visual)
         db.session.commit()
@@ -66,7 +67,8 @@ def generate_visual(title, prompt, associated_type=None, associated_id=None):
                 "title": visual.title,
                 "image_url": url_for('static', filename=image_path.split('static/', 1)[-1], _external=True),
                 "associated_type": visual.associated_type,
-                "associated_id": visual.associated_id
+                "associated_id": visual.associated_id,
+                "evenement_id": visual.evenement_id
             }
         }
     except Exception as e:
@@ -79,7 +81,7 @@ def generate_event_visuals(event_id, theme):
     """
     visuals = []
     errors = []
-
+    theme="Nouvelles technologies emergentes"
     # Condenser le thème si nécessaire
     condensed_theme = theme[:100] + "..." if len(theme) > 100 else theme
 
@@ -112,6 +114,7 @@ def generate_event_visuals(event_id, theme):
                 prompt=visual["prompt"],
                 associated_type="event",
                 associated_id=event_id,
+                evenement_id=event_id
             )
             visuals.append(result)
             print(f"{visual['title']} généré avec succès.")

@@ -31,7 +31,7 @@ def load_mockup_data():
         for feedback in mock_feedbacks:
             try:
                 # Analyse du sentiment via GPT
-                response = openai.ChatCompletion.create(
+                response = openai.chat.completions.create(
                     model="gpt-4",
                     messages=[
                         {"role": "system", "content": "Vous êtes un assistant expert en analyse de sentiment."},

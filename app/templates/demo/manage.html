@@ -28,50 +28,74 @@
         <a class="nav-link" id="tab-participants" data-toggle="tab" href="#content-participants" role="tab"
             aria-controls="content-participants" aria-selected="false">Participants</a>
     </li>
+    <li class="nav-item">
+        <a class="nav-link" id="tab-social-posts" data-toggle="tab" href="#content-social-posts" role="tab"
+            aria-controls="content-social-posts" aria-selected="false">Posts Réseaux Sociaux</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="tab-analysis" data-toggle="tab" href="#content-analysis" role="tab"
+            aria-controls="content-analysis" aria-selected="false">Analyse</a>
+    </li>
 </ul>
 
 <div class="tab-content" id="eventTabsContent">
     <div class="tab-pane fade show active" id="content-conferences" role="tabpanel" aria-labelledby="tab-conferences">
         <h3>Conférences</h3>
-        {% for conference in event.conferences %}
+        {% for conference in conferences %}
         <div class="card mb-3">
             <div class="card-body">
                 <h5>{{ conference.theme }}</h5>
                 <p><strong>Horaire :</strong> {{ conference.horaire }}</p>
-                <p>{{ conference.description }}</p>
+                <p class="card-text text-truncate">{{ conference.description }}</p>
+                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#contentModal"
+                    data-title="{{ conference.theme }}" data-content="{{ conference.description }}">
+                    Lire plus
+                </button>
             </div>
         </div>
         {% endfor %}
     </div>
     <div class="tab-pane fade" id="content-visuals" role="tabpanel" aria-labelledby="tab-visuals">
         <h3>Visuels</h3>
-        {% for visual in event.Visuals %}
-        <div class="card mb-3">
-            <img src="{{ visual.image_url }}" class="card-img-top" alt="{{ visual.title }}">
-            <div class="card-body">
-                <h5>{{ visual.title }}</h5>
+        <div class="d-flex flex-wrap justify-content-start gap-3">
+            {% for visual in visuals %}
+            <div class="card" style="width: 150px;">
+                <img src="{{ visual.image_url }}" class="card-img-top" alt="{{ visual.title }}"
+                    style="height: 150px; object-fit: cover;" data-bs-toggle="modal" data-bs-target="#contentModal"
+                    data-title="{{ visual.title }}" data-content="{{ visual.title }}"
+                    data-image="{{ visual.image_url }}">
             </div>
+            {% endfor %}
         </div>
-        {% endfor %}
     </div>
+
     <div class="tab-pane fade" id="content-feedbacks" role="tabpanel" aria-labelledby="tab-feedbacks">
         <h3>Feedbacks</h3>
-        {% for feedback in event.feedbacks %}
+        {% for feedback in feedbacks %}
         <div class="card mb-3">
             <div class="card-body">
                 <p><strong>{{ feedback.participant_name }}</strong> ({{ feedback.participant_email }})</p>
-                <p>{{ feedback.feedback_text }}</p>
+                <p class="card-text text-truncate">{{ feedback.feedback_text }}</p>
+                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#contentModal"
+                    data-title="Feedback de {{ feedback.participant_name }}"
+                    data-content="{{ feedback.feedback_text }}">
+                    Voir plus
+                </button>
             </div>
         </div>
         {% endfor %}
     </div>
     <div class="tab-pane fade" id="content-articles" role="tabpanel" aria-labelledby="tab-articles">
         <h3>Articles</h3>
-        {% for article in event.articles %}
+        {% for article in articles %}
         <div class="card mb-3">
             <div class="card-body">
                 <h5>{{ article.title }}</h5>
-                <p>{{ article.content }}</p>
+                <p class="card-text text-truncate">{{ article.content }}</p>
+                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#contentModal"
+                    data-title="{{ article.title }}" data-content="{{ article.content }}">
+                    Lire plus
+                </button>
             </div>
         </div>
         {% endfor %}
@@ -83,26 +107,62 @@
             <div class="card-body">
                 <h5>{{ speaker.nom }} {{ speaker.prenom }}</h5>
                 <p><strong>Profession :</strong> {{ speaker.profession }}</p>
-                <p>{{ speaker.bio }}</p>
+                <p class="card-text text-truncate">{{ speaker.bio }}</p>
+                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#contentModal"
+                    data-title="{{ speaker.nom }} {{ speaker.prenom }}" data-content="{{ speaker.bio }}">
+                    Voir plus
+                </button>
             </div>
         </div>
         {% endfor %}
     </div>
     <div class="tab-pane fade" id="content-participants" role="tabpanel" aria-labelledby="tab-participants">
         <h3>Participants</h3>
-        {% for participant in event.conferences|map(attribute='participants')|unique %}
+        {% for participant in participants %}
         <div class="card mb-3">
             <div class="card-body">
                 <h5>{{ participant.nom }} {{ participant.prenom }}</h5>
                 <p><strong>Email :</strong> {{ participant.email }}</p>
                 <p><strong>Profession :</strong> {{ participant.profession }}</p>
+                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#contentModal"
+                    data-title="{{ participant.nom }} {{ participant.prenom }}"
+                    data-content="Email : {{ participant.email }} Profession : {{ participant.profession }}">
+                    Voir plus
+                </button>
             </div>
         </div>
         {% endfor %}
     </div>
+    <div class="tab-pane fade" id="content-social-posts" role="tabpanel" aria-labelledby="tab-social-posts">
+        <h3>Posts Réseaux Sociaux</h3>
+        {% for post in social_posts %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5>{{ post.platform }}</h5>
+                <p class="card-text text-truncate">{{ post.content }}</p>
+                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#contentModal"
+                    data-title="Post sur {{ post.platform }}" data-content="{{ post.content }}"
+                    data-image="{{ post.image_url }}">
+                    Voir plus
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="tab-pane fade" id="content-analysis" role="tabpanel" aria-labelledby="tab-analysis">
+        <h3>Analyse des Données</h3>
+        <div id="uploadAnalysis">
+            <label for="fileInput">Télécharger un fichier à analyser (CSV uniquement) :</label>
+            <input type="file" id="fileInput" class="form-control">
+            <button id="uploadFileButton" class="btn btn-primary mt-3">Analyser le fichier</button>
+            <button id="analyzeWithGPTButton" class="btn btn-success mt-3">Analyser avec GPT</button>
+        </div>
+        <div id="analysisResult" class="mt-4">
+            <!-- Les résultats de l'analyse s'afficheront ici -->
+        </div>
+    </div>
 </div>
-
-<div>
+<div style="padding-top:10px;">
     <a id="backToProjects" class="btn btn-danger">Retour aux projets</a>
     <!-- Bouton pour lancer la génération complète -->
     <button id="generateCompleteEvent" class="btn btn-success">Générer un événement complet</button>
@@ -130,6 +190,26 @@
                 <ul id="generationSteps" class="list-group" style="display: none;">
                     <!-- Étapes de la génération ajoutées ici -->
                 </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="contentModal" tabindex="-1" aria-labelledby="contentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="contentModalLabel">Détails</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Le contenu détaillé sera inséré ici dynamiquement -->
+                <div id="modalContent">
+                    Chargement...
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>

@@ -3,16 +3,18 @@
 {% block title %}Demo gestion evenement{% endblock %}
 
 {% block content %}
-<div class="sidebar">
-    <h2>Projets</h2>
-    <div class="mt-4">
-        <button id="toggleCreate" class="btn btn-primary">Créer un projet</button>
+<div class="d-flex">
+    <div class="sidebar bg-primary text-white p-4">
+        <h2>Projets</h2>
+        <div class="mt-4">
+            <button id="toggleCreate" class="btn btn-light w-100">Créer un projet</button>
+        </div>
     </div>
-</div>
-<div class="main-content">
-    <div class="container text-center my-3">
-        <div id="dynamicContent">
-            {% include "demo/lists.html" %}
+    <div class="main-content flex-grow-1 p-4">
+        <div class="container text-center my-3">
+            <div id="dynamicContent">
+                {% include "demo/lists.html" %}
+            </div>
         </div>
     </div>
 </div>

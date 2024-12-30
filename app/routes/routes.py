@@ -1,4 +1,4 @@
-from flask import flash, redirect, render_template, jsonify, request, url_for
+from flask import Blueprint, flash, redirect, render_template, jsonify, request, url_for
 from app.controllers.home_controller import home
 from app.controllers.visual_controller import (
     generate_visual,
@@ -38,6 +38,8 @@ from app.controllers.demo_controller import (
 
 from app.controllers.participants_controller import manage_participants, generate_random_participant, generate_random_demo_participant
 from app.services.article_service import test_articles
+from app.services.data_service import analyze_file, analyze_file_with_gpt
+
 
 def get_feedbacks():
     """Récupère tous les feedbacks pour une API."""
@@ -62,6 +64,7 @@ def data():
     
 def initialize_routes(app):
     """Ajout des routes spécifiques pour la gestion des projets et des entités associées."""
+
     # Route principale
     app.add_url_rule('/', 'home', home, methods=['GET'])
 
@@ -117,6 +120,8 @@ def initialize_routes(app):
     app.add_url_rule('/events/create','create_template_event_form',create_template_event_form,methods=['GET'])
     app.add_url_rule('/api/generate_full_event','generate_full_event',generate_full_event, methods=['POST'])
     app.add_url_rule('/api/test/articles','test_articles',test_articles, methods=['POST'])
+    app.add_url_rule('/api/analyze_file','analyze_file',analyze_file, methods=['POST'])
+    app.add_url_rule('/api/analyze_file_with_gpt','analyze_file_with_gpt',analyze_file_with_gpt, methods=['POST'])
 
     @app.route('/tables', methods=['GET'])
     def display_tables():

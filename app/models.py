@@ -1,6 +1,6 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
-from datetime import datetime
+from datetime import datetime, date
 from app import db
 
 class Evenement(db.Model):
@@ -8,12 +8,13 @@ class Evenement(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     titre = db.Column(db.String(255), nullable=False)
-    date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    date = db.Column(db.Date, nullable=False,default=date.today())
     description = db.Column(db.Text, nullable=True)
     theme = db.Column(db.Text, nullable=True)
     conferences = db.relationship('Conference', backref='evenement', lazy=True, cascade="all, delete-orphan")
     feedbacks = db.relationship('Feedback', backref='evenement', lazy=True, cascade="all, delete-orphan")
-    Visuals = db.relationship('Visual', backref='evenement', lazy=True, cascade="all, delete-orphan")
+    visuals = db.relationship('Visual', backref='evenement', lazy=True, cascade="all, delete-orphan")
+    articles = db.relationship('Article', backref='evenement', lazy=True, cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<Evenement {self.titre}>"

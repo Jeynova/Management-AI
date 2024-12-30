@@ -73,6 +73,35 @@
         margin: 0 -20px; /* Écarter légèrement les flèches */
     }
 
+    .card {
+    border: 1px solid #ddd; /* Légère bordure pour séparer visuellement les cartes */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Ombre légère */
+    transition: transform 0.3s ease; /* Animation au survol */
+    max-width: 18rem; /* Limiter la largeur des cartes */
+    margin: auto;
+    }
+
+    .card:hover {
+        transform: scale(1.05); /* Agrandit légèrement la carte au survol */
+    }
+
+    .card img {
+        border-radius: 5px; /* Arrondi les coins de l'image */
+}
+    .card-title {
+        font-size: 1.2rem; /* Taille fixe du titre */
+        text-align: center;
+    }
+
+    .card-text {
+        font-size: 0.9rem; /* Taille fixe du texte */
+        text-align: justify; /* Justifier le texte */
+        max-height: 4.5rem; /* Limiter la hauteur */
+        overflow: hidden; /* Masquer le texte débordant */
+        text-overflow: ellipsis; /* Ajouter ... pour le texte coupé */
+        white-space: nowrap; /* Empêcher le retour à la ligne */
+    }
+
     @media (max-width: 767px) {
         .carousel-inner .carousel-item > div {
             display: none;

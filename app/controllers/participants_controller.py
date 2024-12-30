@@ -6,7 +6,7 @@ import random
 from flask import jsonify
 import json
 
-def manage_participants():
+def manage_participants(event_id):
     """Gère les participants."""
     if request.method == 'POST':
         # Ajouter un participant
@@ -33,12 +33,12 @@ def manage_participants():
             db.session.rollback()
             flash(f"Erreur lors de l'ajout : {str(e)}", "danger")
 
-        return redirect(url_for('manage_participants'))
+        # Rediriger vers la même page avec l'event_id
+        return redirect(url_for('manage_participants', event_id=event_id))
 
     # Récupérer tous les participants
     participants = Participant.query.all()
-    return render_template('participants/manage.html',page_name='participants', participants=participants)
-
+    return render_template('participants/manage.html', page_name='participants', participants=participants, event_id=event_id)
 
 # Configuration de l'API GPT
 openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -48,23 +48,14 @@ def generate_random_participant():
     try:
         # Prompt pour GPT
         prompt = """
-        Génère un profil fictif d'un participant à une conférence avec les informations suivantes :
+        Génère un profil fictif d'un participant à une conférence avec les informations suivantes. Respecte à la lettre les clés utilisées sans ajouter d'accent ou autre caracteres spéciaux:
         - Nom
-        - Prénom
+        - Prenom
         - Sexe (Homme ou Femme)
-        - Âge (entre 18 et 65 ans)
+        - Age (entre 18 et 65 ans)
         - Profession
         - Email (format valide)
-        Retourne les informations sous forme de JSON.
-        Voici un exemple de structure : 
-                    {
-            "Nom": "Dupont",
-            "Prenom": "Jean",
-            "Sexe": "Homme",
-            "Age": 40,
-            "Profession": "Ingénieur en informatique",
-            "Email": "jean.dupont@email.com"
-            }
+        Retourne uniquement les informations sous forme de JSON.
         """
 
         response = openai.chat.completions.create(
@@ -77,21 +68,30 @@ def generate_random_participant():
         )
 
         participant_data = response.choices[0].message.content.strip()
-        return jsonify(participant_data=participant_data), 200
+        # Valider et parser les données
+        try:
+            participant_data = json.loads(participant_data)
+            required_keys = {"Nom", "Prenom", "Sexe", "Age", "Profession", "Email"}
+            if not required_keys.issubset(participant_data):
+                raise ValueError(f"Données manquantes : {required_keys - participant_data.keys()}")
+        except json.JSONDecodeError:
+            raise ValueError("JSON invalide généré par GPT.")
+
+        return jsonify(participant_data=json.dumps(participant_data)), 200
 
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": f"Erreur lors de la génération des participants : {str(e)}"}), 500
     
 def generate_random_demo_participant(number=5):
     """Génère des données fictives pour plusieurs participants et les ajoute à la base."""
     try:
         # Prompt pour GPT
         prompt = f"""
-        Génère {number} profils fictifs de participants à une conférence avec les informations suivantes :
+        Génère {number} profils fictifs de participants à une conférence avec les informations suivantes. Respecte à la lettre les clés utilisées sans ajouter d'accent ou autre caracteres spéciaux :
         - Nom
-        - Prénom
+        - Prenom
         - Sexe (Homme ou Femme)
-        - Âge (entre 18 et 65 ans)
+        - Age (entre 18 et 65 ans)
         - Profession
         - Email (format valide)
         Retourne les informations sous forme de JSON (liste de dictionnaires).

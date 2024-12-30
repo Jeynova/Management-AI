@@ -8,7 +8,7 @@ load_dotenv()
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-def manage_speakers():
+def manage_speakers(event_id):
     """Affiche et gère les conférenciers existants."""
     if request.method == 'POST':
         # Ajouter un conférencier
@@ -39,7 +39,7 @@ def manage_speakers():
 
     # Liste des conférenciers existants
     speakers = Speaker.query.all()
-    return render_template('speakers/manage_speakers.html',page_name='speakers', speakers=speakers)
+    return render_template('speakers/manage.html',page_name='speakers', speakers=speakers)
 
 def regenerate_biography(speaker_id):
     """Régénère la biographie pour un orateur spécifique, même si elle existe déjà."""

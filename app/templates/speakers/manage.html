@@ -15,6 +15,7 @@
                 <th>Prénom</th>
                 <th>Profession</th>
                 <th>Biographie</th>
+                <th>Action</th>
             </tr>
         </thead>
         <tbody>
@@ -25,6 +26,10 @@
                 <td>{{ speaker.prenom }}</td>
                 <td>{{ speaker.profession }}</td>
                 <td>{{ speaker.bio or "Non spécifiée" }}</td>
+                <td>
+                    <a href="#" class="btn btn-sm btn-primary">Modifier</a>
+                    <a href="#" class="btn btn-sm btn-danger">Supprimer</a>
+                </td>
             </tr>
             {% endfor %}
         </tbody>
@@ -32,6 +37,9 @@
 
     <!-- Formulaire de création -->
     <h2>Ajouter un nouveau conférencier</h2>
+    <button id="fill-with-ai" class="btn btn-outline-info mb-3">
+        <i class="fas fa-magic"></i> Remplir avec GPT
+    </button>
     <form method="POST">
         <div class="mb-3">
             <label for="nom" class="form-label">Nom</label>

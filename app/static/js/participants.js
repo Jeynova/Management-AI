@@ -5,12 +5,7 @@ document.getElementById("fill-with-ai").addEventListener("click", function () {
             const participant = JSON.parse(data.participant_data);
 
             // Nettoyer tous les champs
-            document.getElementById("nom").value = "";
-            document.getElementById("prenom").value = "";
-            document.getElementById("email").value = "";
-            document.getElementById("sexe").value = "Homme"; // Valeur par défaut
-            document.getElementById("age").value = "";
-            document.getElementById("profession").value = "";
+            clearFields()
 
             // Remplir les champs avec les données générées
             document.getElementById("nom").value = participant.Nom || "";
@@ -24,3 +19,14 @@ document.getElementById("fill-with-ai").addEventListener("click", function () {
             console.error("Erreur lors de la génération des données : ", error);
         });
 });
+
+function clearFields() {
+    const fields = ["nom", "prenom", "email", "sexe", "age", "profession"];
+    fields.forEach((field) => {
+        const input = document.getElementById(field);
+        input.value = "";
+        input.style.transition = "background-color 0.3s ease";
+        input.style.backgroundColor = "#f8d7da"; // Couleur d'effacement
+        setTimeout(() => (input.style.backgroundColor = ""), 300); // Retour à la normale
+    });
+}

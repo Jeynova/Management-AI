@@ -213,52 +213,66 @@ def run_app():
             "Chat Continu avec GPT-4"
         ])
 
-        # Gérer les options
+        if st.button("Générer une réponse"):
+            with st.spinner('Génération de la réponse...'):
+                if option == "Aperçu du fichier (Structure générale des données)":
+                    apercu_du_fichier(df)
+                elif option == "Valeurs manquantes (Colonnes avec des données manquantes)":
+                    valeurs_manquantes(df)
+                elif option == "Résumé statistique (Analyse des chiffres clés, moyenne, médiane, etc.)":
+                    resume_statistique(df)
+                elif option == "Résumé catégoriel (Fréquences des catégories dans les colonnes textuelles)":
+                    resume_categoriel(df)
+                elif option == "Corrélations (Relations entre colonnes numériques)":
+                    calculer_correlations(df)
+                elif option == "Analyse automatisée des résultats (Interprétation automatique avec GPT-4)":
+                    # Analyse GPT-4 automatique
+                    data = {
+                        "corrélations": calculer_correlations(df).to_dict() if not df.select_dtypes(include=[np.number]).empty else None,
+                        "résumé_statistique": df.describe().transpose().to_dict(),
+                        "résumé_catégoriel": {col: df[col].value_counts().to_dict() for col in df.select_dtypes(include=['object', 'category']).columns}
+                    }
+                    reponse = analyse_par_gpt4(
+                        "Analysez les corrélations, résumés statistiques et catégoriels de ces données et proposez des recommandations.",
+                        data
+                    )
+                    st.write("Résultat généré par GPT-4 :")
+                    st.write(reponse)
+                elif option == "Posez vos propres questions ponctuelles à GPT-4":
+                    # Posez une question unique à GPT-4
+                    question = st.text_input("Entrez votre question pour GPT-4", "")
+                    if st.button("Envoyer"):
+                        if question.strip():
+                            contexte = df.head().to_dict()
+                            reponse = analyse_par_gpt4(
+                                f"Voici un aperçu des données : {contexte}\n\n{question}",
+                                {}
+                            )
+                            st.write("Réponse de GPT-4 :")
+                            st.write(reponse)
+                        else:
+                            st.error("Veuillez entrer une question avant de cliquer sur le bouton.")
+                elif option == "Chat Continu avec GPT-4":
+                    # Chat continu avec GPT-4
+                    user_input = st.text_input("Posez une question à GPT-4 :", "")
+                    if st.button("Envoyer"):
+                        if user_input.strip():
+                            with st.spinner("GPT-4 réfléchit..."):
+                                reponse = query_assistant_continuous(user_input)
+                            st.write(f"**Vous :** {user_input}")
+                            st.write(f"**GPT-4 :** {reponse}")
+                        else:
+                            st.error("Veuillez entrer une question avant d'envoyer.")
 
-        # Intégrer dans "Chat Continu avec GPT-4"
-        # Chat Continu avec GPT-4
-        if option == "Chat Continu avec GPT-4":
-            st.write("### Chat avec GPT-4")
-
-            # Interface utilisateur avec champ de saisie et bouton
-            with st.form(key="chat_form"):
-                user_input = st.text_input("Posez une question à GPT-4 :", key="chat_input", placeholder="Tapez votre message ici...")
-                submit_button = st.form_submit_button("Envoyer")
-
-            # Traiter la question une fois envoyée
-            if submit_button and user_input.strip():
-                # Vérifier si le dernier message utilisateur est identique
-                if not st.session_state.messages or st.session_state.messages[-1]["content"] != user_input:
-                    with st.spinner("GPT-4 réfléchit..."):
-                        response = query_assistant_continuous(user_input, df)
-
-                        # Ajouter la réponse uniquement si elle est nouvelle
-                        if not st.session_state.messages or st.session_state.messages[-1]["content"] != response:
-                            st.session_state.messages.append({"role": "assistant", "content": response})
-                else:
-                    st.warning("Message déjà envoyé. Posez une nouvelle question.")
-
-            # Afficher les messages dans le chat
-            afficher_chat_principal()
-
-        elif option == "Posez vos propres questions ponctuelles à GPT-4":
-            # Posez une question unique à GPT-4
-            question = st.text_input("Entrez votre question pour GPT-4", key="question_input")
-            if st.button("Envoyer"):
-                if question.strip():
-                    contexte = df.head().to_dict()
-                    with st.spinner("GPT-4 réfléchit..."):
-                        response = analyse_par_gpt4(
-                            f"Voici un aperçu des données : {contexte}\n\n{question}",
-                            {}
-                        )
-                    st.write("Réponse de GPT-4 :")
-                    st.write(response)
-                else:
-                    st.error("Veuillez entrer une question avant de cliquer sur le bouton.")
+                    # Afficher l'historique complet
+                    st.write("### Historique de la conversation")
+                    for message in st.session_state.messages:
+                        if message["role"] == "user":
+                            st.write(f"**Vous :** {message['content']}")
+                        elif message["role"] == "assistant":
+                            st.write(f"**GPT-4 :** {message['content']}")
 
 # Exécution de l'application
 if __name__ == '__main__':
     afficher_sidebar()
     run_app()
-
