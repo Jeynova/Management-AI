@@ -36,9 +36,12 @@ from app.controllers.demo_controller import (
     generate_full_event
 )
 
-from app.controllers.participants_controller import manage_participants, generate_random_participant, generate_random_demo_participant
+from app.controllers.participants_controller import manage_participants, generate_random_participant, generate_random_demo_participant,register_participant,test_register
 from app.services.article_service import test_articles
 from app.services.data_service import analyze_file, analyze_file_with_gpt
+from flask import request, jsonify
+
+
 
 
 def get_feedbacks():
@@ -122,6 +125,7 @@ def initialize_routes(app):
     app.add_url_rule('/api/test/articles','test_articles',test_articles, methods=['POST'])
     app.add_url_rule('/api/analyze_file','analyze_file',analyze_file, methods=['POST'])
     app.add_url_rule('/api/analyze_file_with_gpt','analyze_file_with_gpt',analyze_file_with_gpt, methods=['POST'])
+    app.add_url_rule('/test/register','test_register',test_register, methods=['POST'])
 
     @app.route('/tables', methods=['GET'])
     def display_tables():
@@ -149,6 +153,7 @@ def initialize_routes(app):
             speakers=speakers,
             conferences=conferences_with_participants
         )
+
 
 def chat():
     """Affiche l'interface de chat."""

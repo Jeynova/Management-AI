@@ -233,3 +233,43 @@ def test_articles():
     except Exception as e:
         return jsonify({"error": f"Erreur lors du test des articles : {str(e)}"}), 500
     
+def generate_press_releases(event, media_types=["presse écrite", "journaux spécialisés", "réseaux sociaux", "newsletters"]):
+    """
+    Génère des communiqués de presse pour différents médias et retourne les résultats.
+    """
+    releases = []
+    for media in media_types:
+        prompt = f"""
+        Rédige un communiqué de presse pour promouvoir l'événement suivant :
+        - Titre : {event.titre}
+        - Date : {event.date.strftime('%Y-%m-%d')}
+        - Description : {event.description or "Pas de description fournie."}
+        Médium : {media}
+        Style : Adapté à {media}.
+        Format attendu :
+        Titre: [Titre du communiqué]
+        Contenu:
+        [Texte du communiqué]
+        """
+        try:
+            response = openai.ChatCompletion.create(
+                model="gpt-4",
+                messages=[
+                    {"role": "system", "content": "Tu es un expert en rédaction de communiqués de presse."},
+                    {"role": "user", "content": prompt}
+                ],
+                max_tokens=500
+            )
+            content = response.choices[0].message.content.strip()
+            releases.append({
+                "media": media,
+                "content": content
+            })
+        except Exception as e:
+            print(f"Erreur lors de la génération pour {media} : {e}")
+
+    return {
+        "message": f"{len(releases)} communiqués générés.",
+        "releases": releases,
+        "success": len(releases) > 0
+    }

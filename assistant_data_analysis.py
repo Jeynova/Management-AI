@@ -15,7 +15,7 @@ load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 pipedream_url = os.getenv("PIPEDREAM_SQL")
 # Chargement du fichier SVG
-svg_file_path = "static/images/sources/logo.svg"
+svg_file_path = "app/static/images/sources/logo.svg"
 with open(svg_file_path, "r", encoding="utf-8") as svg_file:
     svg_logo = svg_file.read()
 

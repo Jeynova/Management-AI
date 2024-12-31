@@ -11,7 +11,7 @@ from app.services.feedback_service import generate_random_feedbacks
 from app.services.participant_service import generate_random_participants_with_gpt, save_participants_to_db
 from app.services.speaker_service import generate_random_speakers_with_biographies, save_speakers_with_biographies_to_db
 from app.services.conference_service import generate_conferences_for_event
-from app.services.article_service import generate_articles
+from app.services.article_service import generate_articles, generate_press_releases
 from app.services.visual_service import generate_event_visuals
 from app.services.social_service import generate_social_posts
 
@@ -190,38 +190,42 @@ def generate_full_event():
     current_event = Evenement.query.order_by(Evenement.id.desc()).first()
 
     # Étape 1 : Générer et sauvegarder les participants
-    participants_data = generate_random_participants_with_gpt(batch_size=5, total=5)
-    participants = save_participants_to_db(participants_data)
-    steps.append({"message": f"{len(participants)} participants générés.", "success": True})
+    #participants_data = generate_random_participants_with_gpt(batch_size=5, total=5)
+    #participants = save_participants_to_db(participants_data)
+    #steps.append({"message": f"{len(participants)} participants générés.", "success": True})
 
     # Étape 2 : Générer et sauvegarder les orateurs avec biographies
-    speakers_data = generate_random_speakers_with_biographies(batch_size=2, total=3)
-    speakers = save_speakers_with_biographies_to_db(speakers_data)
-    steps.append({"message": f"{len(speakers)} orateurs générés avec biographies.", "success": True})
+    #speakers_data = generate_random_speakers_with_biographies(batch_size=2, total=3)
+    #speakers = save_speakers_with_biographies_to_db(speakers_data)
+    #steps.append({"message": f"{len(speakers)} orateurs générés avec biographies.", "success": True})
 
     # Étape 3 : Générer des conférences
-    conferences_response = generate_conferences_for_event(event_id=current_event.id)
-    steps.append({"message": f"3 conférences générées avec succès.", "success": True})
+    #conferences_response = generate_conferences_for_event(event_id=current_event.id)
+    #steps.append({"message": f"3 conférences générées avec succès.", "success": True})
 
     # 4. Associer des participants et des speakers
     """ associate_participants_and_speakers(conferences, participants)
     steps.append({"message": "Participants et orateurs associés aux conférences.", "success": True}) """
 
     # Étape 4 : Générer des articles pour l'événement et les conférences
-    articles_response = generate_articles(event_id=current_event.id)
-    steps.append({"message": articles_response["message"], "success": articles_response["success"]})
+    #articles_response = generate_articles(event_id=current_event.id)
+    #steps.append({"message": articles_response["message"], "success": articles_response["success"]})
 
-    # 5. Générer des feedbacks aléatoires
-    print(conferences_response)
-    if "conferences" in conferences_response:
-        feedbacks = generate_random_feedbacks(conferences_response["conferences"], participants, number=3)
-        steps.append({"message": f"{len(feedbacks)} feedbacks générés.", "success": True})
-    else:
-        steps.append({"message": "Échec de la génération des conférences.", "success": False})
+    # Étape 5 : Générer des articles pour l'événement et les conférences
+    press_releases = generate_press_releases(current_event)
+    steps.append({"message": press_releases["message"], "success": press_releases["success"]})
 
-    # 6. Générer des visuels
-    visuals = generate_event_visuals(current_event.id,current_event.theme)
-    steps.append({"message": f"{len(visuals)} visuels générés.", "success": True})
+    # 6. Générer des feedbacks aléatoires
+    #print(conferences_response)
+    #if "conferences" in conferences_response:
+   #     feedbacks = generate_random_feedbacks(conferences_response["conferences"], participants, number=3)
+    #    steps.append({"message": f"{len(feedbacks)} feedbacks générés.", "success": True})
+    #else:
+    #    steps.append({"message": "Échec de la génération des conférences.", "success": False})
+
+    # 7. Générer des visuels
+    #visuals = generate_event_visuals(current_event.id,current_event.theme)
+    #steps.append({"message": f"{len(visuals)} visuels générés.", "success": True})
 
 
     # 8. Générer des posts pour les réseaux sociaux et visuels associés

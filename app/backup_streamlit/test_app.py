@@ -14,10 +14,10 @@ os.environ['OPENAI_API_KEY'] = apikey
 load_dotenv(find_dotenv())
 
 #Title
-st.title('AI Assistant for Data Science 🤖')
+st.title('AI Assistant for Data Science ü§ñ')
 
 #Welcoming message
-st.write("Hello, 👋 I am your AI Assistant and I am here to help you with your data science projects.")
+st.write("Hello, üëã I am your AI Assistant and I am here to help you with your data science projects.")
 
 #Explanation sidebar
 with st.sidebar:
@@ -31,7 +31,7 @@ with st.sidebar:
 
     st.divider()
 
-    st.caption("<p style ='text-align:center'> made with ❤️ by Ana</p>",unsafe_allow_html=True )
+    st.caption("<p style ='text-align:center'> made with ‚ù§Ô∏è by Ana</p>",unsafe_allow_html=True )
 
 #Initialise the key in session state
 if 'clicked' not in st.session_state:

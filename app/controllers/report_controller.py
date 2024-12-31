@@ -9,7 +9,7 @@ def report():
     try:
         file_path = os.path.join('data', 'participants.json')
         if not os.path.exists(file_path):
-            return jsonify({"message": "Aucun participant trouvé."})
+            return jsonify({"message": "Aucun participant trouv√©."})
 
         with open(file_path, 'r') as file:
             participants_data = json.load(file)

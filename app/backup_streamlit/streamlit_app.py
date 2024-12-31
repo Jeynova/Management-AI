@@ -1,4 +1,4 @@
-# Import des bibliothèques nécessaires
+# Import des biblioth√®ques n√©cessaires
 import os
 import streamlit as st
 import pandas as pd
@@ -8,54 +8,54 @@ from langchain_experimental.agents import create_pandas_dataframe_agent
 from langchain.schema import SystemMessage, HumanMessage
 from dotenv import load_dotenv, find_dotenv
 
-# Charger la clé API OpenAI
+# Charger la cl√© API OpenAI
 load_dotenv(find_dotenv())
 os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
 
 # Configuration de la page
 st.set_page_config(
-    page_title="Assistant Admin Conférence",
+    page_title="Assistant Admin Conf√©rence",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
 # Titre de la page
-st.title("Assistant Admin - Gestion de Conférence 📅")
+st.title("Assistant Admin - Gestion de Conf√©rence üìÖ")
 
 # Sidebar pour les options principales
 with st.sidebar:
     st.header("Bienvenue dans l'Assistant Admin !")
     st.write("""
-        Cet assistant virtuel vous aide à organiser et gérer votre conférence technologique. 
-        Il est conçu pour être flexible et s'adapter à vos besoins spécifiques :
-        - **Planification d'événements**
-        - **Création de contenu**
+        Cet assistant virtuel vous aide √† organiser et g√©rer votre conf√©rence technologique. 
+        Il est con√ßu pour √™tre flexible et s'adapter √† vos besoins sp√©cifiques :
+        - **Planification d'√©v√©nements**
+        - **Cr√©ation de contenu**
         - **Analyse de fichiers**
         - **Communication et marketing**
     """)
-    st.caption("Posez vos questions ou téléversez des fichiers pour commencer !")
+    st.caption("Posez vos questions ou t√©l√©versez des fichiers pour commencer !")
 
-    # Options principales dans la barre latérale
+    # Options principales dans la barre lat√©rale
     st.header("Que voulez-vous faire ?")
     choice = st.selectbox(
-        "Choisissez une tâche :",
-        ["Planification d'événement", "Création de contenu", "Analyse de fichiers", "Communication et marketing"]
+        "Choisissez une t√¢che :",
+        ["Planification d'√©v√©nement", "Cr√©ation de contenu", "Analyse de fichiers", "Communication et marketing"]
     )
 
 # Initialisation de l'historique des messages
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# Fonction pour gérer l'historique du chat
+# Fonction pour g√©rer l'historique du chat
 def query_assistant_continuous(prompt):
-    """Gère la continuité de la conversation avec l'IA."""
-    # Ajouter le message utilisateur à l'historique
+    """G√®re la continuit√© de la conversation avec l'IA."""
+    # Ajouter le message utilisateur √† l'historique
     st.session_state.messages.append({"role": "user", "content": prompt})
 
     # Appeler OpenAI avec l'historique des messages
     llm = ChatOpenAI(model="gpt-4", temperature=0.7)
     response = llm.predict_messages([
-        SystemMessage(content="Tu es un assistant pour gérer les conférences."),
+        SystemMessage(content="Tu es un assistant pour g√©rer les conf√©rences."),
         *[
             HumanMessage(content=msg["content"])
             if msg["role"] == "user" else SystemMessage(content=msg["content"])
@@ -63,7 +63,7 @@ def query_assistant_continuous(prompt):
         ]
     ])
 
-    # Ajouter la réponse de l'assistant à l'historique
+    # Ajouter la r√©ponse de l'assistant √† l'historique
     st.session_state.messages.append({"role": "assistant", "content": response.content})
     return response.content
 
@@ -71,74 +71,74 @@ def query_assistant_continuous(prompt):
 def display_chat_history():
     """Affiche l'historique du chat."""
     for message in st.session_state.messages:
-        role = "👤 Utilisateur" if message["role"] == "user" else "🤖 Assistant"
+        role = "üë§ Utilisateur" if message["role"] == "user" else "ü§ñ Assistant"
         st.markdown(f"**{role}:** {message['content']}")
 
-# Fonction pour réinitialiser l'historique
+# Fonction pour r√©initialiser l'historique
 def reset_chat():
-    """Réinitialise la conversation."""
+    """R√©initialise la conversation."""
     st.session_state.messages = []
-    st.success("Conversation réinitialisée.")
+    st.success("Conversation r√©initialis√©e.")
 
-# Section : Planification d'événement
-if choice == "Planification d'événement":
-    st.subheader("Planification d'événement")
-    st.write("Entrez les détails pour planifier votre événement.")
-    event_name = st.text_input("Nom de l'événement")
-    dates = st.date_input("Dates importantes (par exemple, début et fin)")
-    tasks = st.text_area("Quelles sont les grandes étapes à inclure ?")
+# Section : Planification d'√©v√©nement
+if choice == "Planification d'√©v√©nement":
+    st.subheader("Planification d'√©v√©nement")
+    st.write("Entrez les d√©tails pour planifier votre √©v√©nement.")
+    event_name = st.text_input("Nom de l'√©v√©nement")
+    dates = st.date_input("Dates importantes (par exemple, d√©but et fin)")
+    tasks = st.text_area("Quelles sont les grandes √©tapes √† inclure ?")
 
     # Afficher l'historique du chat
     display_chat_history()
 
-    # Entrée utilisateur pour continuer la conversation
+    # Entr√©e utilisateur pour continuer la conversation
     user_input = st.text_input("Posez votre question :", key="plan_event_input")
     if st.button("Envoyer", key="plan_event_submit"):
         if user_input.strip():
             response = query_assistant_continuous(f"[Planification] {user_input}")
-            st.markdown(f"🤖 **Assistant:** {response}")
+            st.markdown(f"ü§ñ **Assistant:** {response}")
 
-    # Réinitialisation de la conversation
-    if st.button("Réinitialiser la conversation", key="plan_event_reset"):
+    # R√©initialisation de la conversation
+    if st.button("R√©initialiser la conversation", key="plan_event_reset"):
         reset_chat()
 
-    if st.button("Générer un plan"):
+    if st.button("G√©n√©rer un plan"):
         prompt = f"""
-        Tu es un expert en planification d'événements.
-        Voici les détails de l'événement :
+        Tu es un expert en planification d'√©v√©nements.
+        Voici les d√©tails de l'√©v√©nement :
         - Nom : {event_name}
         - Dates : {dates}
-        - Étapes : {tasks}
+        - √âtapes : {tasks}
         
-        Génère un plan complet avec des étapes claires et des suggestions.
+        G√©n√®re un plan complet avec des √©tapes claires et des suggestions.
         """
         response = query_assistant_continuous(prompt)
         st.write(response)
 
-# Section : Création de contenu
-elif choice == "Création de contenu":
-    st.subheader("Création de contenu")
-    st.write("Quel type de contenu voulez-vous créer ?")
+# Section : Cr√©ation de contenu
+elif choice == "Cr√©ation de contenu":
+    st.subheader("Cr√©ation de contenu")
+    st.write("Quel type de contenu voulez-vous cr√©er ?")
     content_type = st.selectbox("Type de contenu :", ["Titre de session", "Description", "Email", "Biographie"])
-    content_details = st.text_area("Donnez les détails nécessaires.")
+    content_details = st.text_area("Donnez les d√©tails n√©cessaires.")
 
     # Afficher l'historique du chat
     display_chat_history()
 
-    # Entrée utilisateur pour continuer la conversation
+    # Entr√©e utilisateur pour continuer la conversation
     user_input = st.text_input("Posez votre question :", key="content_input")
     if st.button("Envoyer", key="content_submit"):
         if user_input.strip():
-            response = query_assistant_continuous(f"[Création de contenu] {user_input}")
-            st.markdown(f"🤖 **Assistant:** {response}")
+            response = query_assistant_continuous(f"[Cr√©ation de contenu] {user_input}")
+            st.markdown(f"ü§ñ **Assistant:** {response}")
 
-    # Réinitialisation de la conversation
-    if st.button("Réinitialiser la conversation", key="content_reset"):
+    # R√©initialisation de la conversation
+    if st.button("R√©initialiser la conversation", key="content_reset"):
         reset_chat()
 
-    if st.button("Générer le contenu"):
+    if st.button("G√©n√©rer le contenu"):
         prompt = f"""
-        Tu es un expert en communication événementielle. Crée un {content_type} basé sur ces détails :
+        Tu es un expert en communication √©v√©nementielle. Cr√©e un {content_type} bas√© sur ces d√©tails :
         {content_details}
         """
         response = query_assistant_continuous(prompt)
@@ -147,25 +147,25 @@ elif choice == "Création de contenu":
 # Section : Analyse de fichiers
 elif choice == "Analyse de fichiers":
     st.subheader("Analyse de fichiers")
-    uploaded_file = st.file_uploader("Téléchargez un fichier CSV pour analyse", type=["csv"])
+    uploaded_file = st.file_uploader("T√©l√©chargez un fichier CSV pour analyse", type=["csv"])
 
     if uploaded_file:
         df = pd.read_csv(uploaded_file)
-        st.write("Aperçu des données :")
+        st.write("Aper√ßu des donn√©es :")
         st.write(df.head())
 
         # Afficher l'historique du chat
         display_chat_history()
 
-        # Entrée utilisateur pour poser des questions sur le fichier
+        # Entr√©e utilisateur pour poser des questions sur le fichier
         user_input = st.text_input("Posez une question sur ce fichier :", key="file_input")
         if st.button("Envoyer", key="file_submit"):
             if user_input.strip():
                 response = query_assistant_continuous(f"[Analyse de fichiers] {user_input}")
-                st.markdown(f"🤖 **Assistant:** {response}")
+                st.markdown(f"ü§ñ **Assistant:** {response}")
 
-        # Réinitialisation de la conversation
-        if st.button("Réinitialiser la conversation", key="file_reset"):
+        # R√©initialisation de la conversation
+        if st.button("R√©initialiser la conversation", key="file_reset"):
             reset_chat()
 
 # Section : Communication et marketing
@@ -177,17 +177,17 @@ elif choice == "Communication et marketing":
     # Afficher l'historique du chat
     display_chat_history()
 
-    # Entrée utilisateur pour continuer la conversation
+    # Entr√©e utilisateur pour continuer la conversation
     user_input = st.text_input("Posez votre question :", key="marketing_input")
     if st.button("Envoyer", key="marketing_submit"):
         if user_input.strip():
             response = query_assistant_continuous(f"[Communication et marketing] {user_input}")
-            st.markdown(f"🤖 **Assistant:** {response}")
+            st.markdown(f"ü§ñ **Assistant:** {response}")
 
-    # Réinitialisation de la conversation
-    if st.button("Réinitialiser la conversation", key="marketing_reset"):
+    # R√©initialisation de la conversation
+    if st.button("R√©initialiser la conversation", key="marketing_reset"):
         reset_chat()
 
 # Footer
 st.divider()
-st.caption("Bonne chance à tous pour votre validation. 🚀")
+st.caption("Bonne chance √† tous pour votre validation. üöÄ")

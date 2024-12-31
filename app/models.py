@@ -139,3 +139,12 @@ class SocialPost(db.Model):
 
     def __repr__(self):
         return f"<SocialPost {self.platform} - {self.content[:20]}...>"
+    
+class FileAnswer(db.Model):
+    __tablename__ = 'file_answers'
+
+    id = db.Column(db.Integer, primary_key=True)
+    filename = db.Column(db.String(255), nullable=False)
+    response = db.Column(db.Text, nullable=False)
+    evenement_id = db.Column(db.Integer, db.ForeignKey('evenements.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)   

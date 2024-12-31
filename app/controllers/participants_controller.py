@@ -1,10 +1,18 @@
-from flask import render_template, request, redirect, url_for, flash
+from flask import render_template, request, redirect, url_for, flash, jsonify
+import requests
 from app.models import Participant, db
-import os
 import openai
 import random
-from flask import jsonify
 import json
+from flask_mail import Message
+from io import BytesIO
+import qrcode
+from app.models import Participant
+import os
+from app import db
+import sys
+from mailtrap import Address, Mail, MailtrapClient
+import base64
 
 def manage_participants(event_id):
     """Gère les participants."""
@@ -29,6 +37,8 @@ def manage_participants(event_id):
             db.session.add(participant)
             db.session.commit()
             flash("Participant ajouté avec succès.", "success")
+            print(f"Appel de register_participant avec les données : {request.form}")
+            register_participant(request.form)
         except Exception as e:
             db.session.rollback()
             flash(f"Erreur lors de l'ajout : {str(e)}", "danger")
@@ -169,3 +179,71 @@ def generate_random_demo_participant(number=5):
     except Exception as e:
         db.session.rollback()  # Annuler les transactions en cas d'erreur
         return jsonify({"error": str(e)}), 500
+    
+
+def register_participant(data):
+    """
+    Enregistre un participant et envoie les données à un webhook Pipedream avec QR Code.
+    """
+    try:
+        print("in send")
+        # Récupérer les données
+        email = data.get("email")
+        nom = data.get("nom")
+        prenom = data.get("prenom")
+        age = data.get("age")
+
+        # Validation des données
+        if not all([email, nom, prenom]):
+            return jsonify({"error": "Toutes les informations sont obligatoires."}), 400
+
+        # Générer le QR Code
+        qr_data = f"Participant: {prenom} {nom}, Email: {email}, ID: {age}"
+        qr = qrcode.make(qr_data)
+        qr_buffer = BytesIO()
+        qr.save(qr_buffer)
+        qr_buffer.seek(0)
+
+        # Encode QR code image en base64
+        qr_base64 = base64.b64encode(qr_buffer.getvalue()).decode('utf-8')
+
+        # Construire les données à envoyer au webhook
+        payload = {
+            "nom": nom,
+            "prenom": prenom,
+            "email": email,
+            "age": age,
+            "qr_code": qr_base64
+        }
+
+        # URL du webhook Pipedream
+        pipedream_url = "https://eou1r9maglcv9jv.m.pipedream.net"
+
+        # Envoyer la requête au webhook
+        response = requests.post(pipedream_url, json=payload)
+
+        if response.status_code == 200:
+            return jsonify({'message': 'Données envoyées au webhook avec succès.'}), 200
+        else:
+            return jsonify({'error': f"Erreur lors de l'envoi au webhook : {response.status_code} - {response.text}"}), 500
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
+
+def test_register():
+    """
+    Test de l'inscription d'un participant avec envoi d'email.
+    """
+    # Simuler les données d'inscription
+    data = {
+        "nom": "Dupont",
+        "prenom": "Jean",
+        "email": "truc@gmail.com",  # Remplacez par votre email
+        "sexe": "Homme",
+        "age": 30,
+        "profession": "Ingenieur"
+    }
+
+    # Appeler la fonction d'inscription
+    return register_participant(data)
